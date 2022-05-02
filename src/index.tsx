@@ -1,19 +1,48 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import App from "./App";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Login from "./routes/Login";
+import Register from "./routes/Register";
+import Auctions from "./routes/Auctions";
+import Auction from "./routes/Auction";
 
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  document.getElementById("root") as HTMLElement
 );
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// define routes, then need to create different elements for routes in routes directory
+root.render(
+  <BrowserRouter>
+    <Routes>
+      <Route path="/" element={<App />}>
+        <Route path="auctions" element={<Auctions />}>
+          {/*the index route shares the path of the parent.*/}
+          {/*it doesn't have a path.*/}
+          <Route
+            index
+            element={
+              <main style={{ padding: "1rem" }}>
+                <p>Select an auction</p>
+              </main>
+            }
+          />
+          {/*a route that matches urls like "/invoices/2005"*/}
+          <Route path=":auctionId" element={<Auction />} />
+        </Route>
+        {/*The "*" has special meaning here. It will match only when no other routes do.*/}
+        <Route
+          path="*"
+          element={
+            <main style={{ padding: "1rem" }}>
+              <p>There's nothing here!</p>
+            </main>
+          }
+        />
+      </Route>
+      <Route path="login" element={<Login />} />
+      <Route path="register" element={<Register />} />
+    </Routes>
+  </BrowserRouter>
+);
