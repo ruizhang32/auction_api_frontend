@@ -267,14 +267,22 @@ export default function AuctionForm() {
   };
 
   const setMyAuction = (auction: Auction) =>{
-    setAuctionTitle(auction.title);
-    const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
-    if(myCategory !== undefined){
-      setAuctionCategory(myCategory.name);
+    if(!equals(auction.title, auctionTitle)){
+      setAuctionTitle(auction.title);
     }
-    setDate(new Date(auction.endDate));
-    setDescription(auction.description);
-    setReservePrice(auction.reserve.toString());
+    // const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
+    // if(myCategory !== undefined){
+    //   setAuctionCategory(myCategory.name);
+    // }
+    if(!equals(new Date(auction.endDate), date)){
+      setDate(new Date(auction.endDate));
+    }
+    if(!equals(auction.description, description)){
+      setDescription(auction.description);
+    }
+    if(!equals(auction.reserve.toString(), reservePrice)){
+      setReservePrice(auction.reserve.toString());
+    }
   }
 
   // const searchId = (value: string, myArray: Array<Category>) => {

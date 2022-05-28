@@ -9,4 +9,3 @@ export default function equals(a:any, b:any): boolean {
   if (keys.length !== Object.keys(b).length) return false;
   return keys.every(k => equals(a[k], b[k]));
 }
-
