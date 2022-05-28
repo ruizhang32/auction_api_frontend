@@ -21,6 +21,7 @@ import axios from "axios";
 import AppBar from "../templates/AppBar";
 import Footer from "../templates/Footer";
 import { Link, useParams, useNavigate, Navigate } from "react-router-dom";
+import equals from "../Utility/util";
 
 const MyAuctions = () => {
   const { userId } = useParams();
@@ -80,7 +81,10 @@ const MyAuctions = () => {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        setAuctions(response.data["auctions"]);
+        const fetched_auctions = response.data["auctions"];
+        if(!equals(fetched_auctions, auctions)) {
+          setAuctions(fetched_auctions);
+        }
       },
       (error) => {
         setErrorFlag(true);
@@ -105,7 +109,10 @@ const MyAuctions = () => {
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
-          setBids(response.data);
+          const fetchedBids = response.data;
+          if(!equals(fetchedBids, bids)){
+            setBids(fetchedBids);
+          }
         },
         (error) => {
           setErrorFlag(true);
