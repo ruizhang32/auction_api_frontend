@@ -28,12 +28,17 @@ export default function UserForm() {
   const [lastName, setLastName] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
-  const [user, setUser] = React.useState<User>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  // const [user, setUser] = React.useState<User>({
+  //   firstName: "",
+  //   lastName: "",
+  //   email: "",
+  //   password: "",
+  // });
+  const [myFirstName, setMyFirstName] = React.useState<string>("");
+  const [myLastName, setMyLastName] = React.useState<string>("");
+  const [myEmail, setMyEmail] = React.useState<string>("");
+  const [myCurrentPassword, setMyCurrentPassword] = React.useState<string>("");
+  const [myPassword, setMyPassword] = React.useState<string>("");
   const [userImage, setUserImage] = React.useState<File>(file);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
@@ -56,7 +61,7 @@ export default function UserForm() {
       "email:",
       email
     );
-  }, [firstName, lastName, email, password]);
+  }, []);
 
   const getUser = () => {
     console.log(sellerId);
@@ -66,10 +71,14 @@ export default function UserForm() {
         setErrorMessage("");
         const myUser: User = response.data;
         setFirstName(myUser.firstName);
+        setMyFirstName(myUser.firstName);
         setLastName(myUser.lastName);
+        setMyLastName(myUser.lastName);
         if (myUser.email !== undefined) {
           setEmail(myUser.email);
+          setMyEmail(myUser.email);
         }
+        // setUser(myUser);
       },
       (error) => {
         setErrorFlag(true);
@@ -86,33 +95,33 @@ export default function UserForm() {
   //     password: "",
   //   };
   // }
-  // const patchUserProfile = (bodyParameters : User) => {
-  //
-  //   // const bodyParameters = {
-  //   //   firstName: "",
-  //   //   lastName: "",
-  //   //   email: "",
-  //   //   password: "",
-  //   // };
-  //
-  //   axios
-  //     .patch("http://localhost:4941/api/v1/users/" + sellerId, bodyParameters, config)
-  //     .then(
-  //       (response) => {
-  //         setErrorFlag(false);
-  //         setErrorMessage("");
-  //         setAuction(response.data);
-  //         if (response.status === 200) {
-  //           // auctionIsUpdated === true if auction is created or updated
-  //           setAuctionIsUpdated(true);
-  //         }
-  //       },
-  //       (error) => {
-  //         setErrorFlag(true);
-  //         setErrorMessage(error.toString());
-  //       }
-  //     );
-  // };
+  const patchUserProfile = () => {
+
+    const bodyParameters = {
+      firstName: myFirstName,
+      lastName: myLastName,
+      email: myEmail,
+      currentPassword: myCurrentPassword,
+      password: myPassword,
+    };
+
+    axios
+      .patch("http://localhost:4941/api/v1/users/" + sellerId, bodyParameters, config)
+      .then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+          if (response.status === 200) {
+            getUser();
+          }
+        },
+        (error) => {
+          getUser();
+          setErrorFlag(true);
+          setErrorMessage(error.toString());
+        }
+      );
+  };
 
   // const putAuctionImage = () => {
   //   axios
@@ -266,8 +275,8 @@ export default function UserForm() {
                 id="firstName"
                 label="firstName"
                 type="firstName"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                value={myFirstName}
+                onChange={(e) => setMyFirstName(e.target.value)}
                 sx={{ width: 300 }}
                 variant="outlined"
               />
@@ -277,8 +286,8 @@ export default function UserForm() {
                 id="lastName"
                 label="lastName"
                 type="lastName"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                value={myLastName}
+                onChange={(e) => setMyLastName(e.target.value)}
                 sx={{ width: 300 }}
                 variant="outlined"
               />
@@ -288,10 +297,21 @@ export default function UserForm() {
                 id="email"
                 label="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={myEmail}
+                onChange={(e) => setMyEmail(e.target.value)}
                 sx={{ width: 300 }}
                 variant="outlined"
+              />
+              <TextField
+                  autoFocus
+                  margin="dense"
+                  id="currentPassword"
+                  label="currentPassword"
+                  type="password"
+                  value={myCurrentPassword}
+                  onChange={(e) => setMyCurrentPassword(e.target.value)}
+                  sx={{ width: 300 }}
+                  variant="outlined"
               />
               <TextField
                 autoFocus
@@ -299,15 +319,15 @@ export default function UserForm() {
                 id="password"
                 label="password"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={myPassword}
+                onChange={(e) => setMyPassword(e.target.value)}
                 sx={{ width: 300 }}
                 variant="outlined"
               />
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={handleClose}>Summit</Button>
+              <Button onClick={patchUserProfile}>Summit</Button>
             </DialogActions>
           </Dialog>
         </div>
