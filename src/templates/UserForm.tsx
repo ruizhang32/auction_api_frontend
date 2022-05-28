@@ -1,23 +1,16 @@
-import { Html } from "@mui/icons-material";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { Navigate, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import {
-  Alert, AlertTitle,
+  Alert,
+  AlertTitle,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  OutlinedInput,
   Paper,
-  Select,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import axios from "axios";
@@ -36,10 +29,6 @@ export default function UserForm() {
   const [userImage, setUserImage] = React.useState<File>(file);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
-  const [firstNameOpen, setFirstNameOpen] = React.useState(false);
-  const [lastNameOpen, setLastNameOpen] = React.useState(false);
-  const [emailOpen, setEmailOpen] = React.useState(false);
-  const [passwordOpen, setPasswordOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const sellerId = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("token");
@@ -88,7 +77,11 @@ export default function UserForm() {
     };
 
     axios
-      .patch("http://localhost:4941/api/v1/users/" + sellerId, bodyParameters, config)
+      .patch(
+        "http://localhost:4941/api/v1/users/" + sellerId,
+        bodyParameters,
+        config
+      )
       .then(
         (response) => {
           setErrorFlag(false);
@@ -150,6 +143,8 @@ export default function UserForm() {
     setOpen(false);
   };
 
+  const handleUpdateImage = () => {};
+
   // if (auctionIsUpdated) {
   //   return <Navigate to={"/MyAuctions"}></Navigate>;
   // } else {
@@ -169,27 +164,52 @@ export default function UserForm() {
           </Typography>
         </div>
         <div>
-          <Box
-            sx={{
-              width: 800,
-              height: 450,
-              backgroundColor: "grey",
-              border: "1px dashed grey",
-              mb: 3,
-            }}
-          >
-            <img
-              alt="auction image"
-              src="http://localhost:4941/api/v1/auctions/1/image"
-              style={{
-                maxWidth: 800,
-                maxHeight: 450,
-              }}
-            ></img>
+          <Box>
+            <label htmlFor="contained-button-file">
+              <input
+                style={{
+                  display: "none",
+                }}
+                accept="image/*"
+                id="contained-button-file"
+                multiple
+                type="file"
+                // onChange={onImageChange}
+              />
+              <Button variant="outlined" component="span">
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{
+                        width: 600,
+                        height: 450,
+                        backgroundColor: "grey",
+                        border: "1px dashed grey",
+                        mb: 3,
+                      }}
+                    >
+                      <img
+                        alt="auction image"
+                        src="http://localhost:4941/api/v1/auctions/1/image"
+                        style={{
+                          maxWidth: 600,
+                          maxHeight: 450,
+                        }}
+                      ></img>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Typography variant="body2">
+                      Click to update image
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Button>
+            </label>
           </Box>
         </div>
         <div>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid container spacing={2} sx={{ mb: 3, mt: 2 }}>
             <Grid item xs={6}>
               <Typography
                 variant="h6"
@@ -286,15 +306,15 @@ export default function UserForm() {
                 variant="outlined"
               />
               <TextField
-                  autoFocus
-                  margin="dense"
-                  id="currentPassword"
-                  label="currentPassword"
-                  type="password"
-                  value={myCurrentPassword}
-                  onChange={(e) => setMyCurrentPassword(e.target.value)}
-                  sx={{ width: 300 }}
-                  variant="outlined"
+                autoFocus
+                margin="dense"
+                id="currentPassword"
+                label="currentPassword"
+                type="password"
+                value={myCurrentPassword}
+                onChange={(e) => setMyCurrentPassword(e.target.value)}
+                sx={{ width: 300 }}
+                variant="outlined"
               />
               <TextField
                 autoFocus

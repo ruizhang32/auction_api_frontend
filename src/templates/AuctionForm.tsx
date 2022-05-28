@@ -63,7 +63,7 @@ export default function AuctionForm() {
   React.useEffect(() => {
     getCategories();
     // getCategoryIdByName();
-    if(auctionId !== undefined && parseInt(auctionId) > 0){
+    if (auctionId !== undefined && parseInt(auctionId) > 0) {
       getAnAuction();
       setMyAuction(auction);
     }
@@ -251,39 +251,39 @@ export default function AuctionForm() {
 
   const getAnAuction = () => {
     axios.get("http://localhost:4941/api/v1/auctions/" + auctionId).then(
-        (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
-          const myAction : Auction = response.data;
-          if(!equals(myAction, auction)){
-            setAuction(myAction);
-          }
-        },
-        (error) => {
-          setErrorFlag(true);
-          setErrorMessage(error.response.statusText);
+      (response) => {
+        setErrorFlag(false);
+        setErrorMessage("");
+        const myAction: Auction = response.data;
+        if (!equals(myAction, auction)) {
+          setAuction(myAction);
         }
+      },
+      (error) => {
+        setErrorFlag(true);
+        setErrorMessage(error.response.statusText);
+      }
     );
   };
 
-  const setMyAuction = (auction: Auction) =>{
-    if(!equals(auction.title, auctionTitle)){
+  const setMyAuction = (auction: Auction) => {
+    if (!equals(auction.title, auctionTitle)) {
       setAuctionTitle(auction.title);
     }
     // const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
     // if(myCategory !== undefined){
     //   setAuctionCategory(myCategory.name);
     // }
-    if(!equals(new Date(auction.endDate), date)){
+    if (!equals(new Date(auction.endDate), date)) {
       setDate(new Date(auction.endDate));
     }
-    if(!equals(auction.description, description)){
+    if (!equals(auction.description, description)) {
       setDescription(auction.description);
     }
-    if(!equals(auction.reserve.toString(), reservePrice)){
+    if (!equals(auction.reserve.toString(), reservePrice)) {
       setReservePrice(auction.reserve.toString());
     }
-  }
+  };
 
   // const searchId = (value: string, myArray: Array<Category>) => {
   //   for (let i = 0; i < myArray.length; i++) {
@@ -320,12 +320,11 @@ export default function AuctionForm() {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        const categoryObjects : Array<Category> = response.data;
-        console.log(categoryObjects)
-        if(!equals(categoryObjects, categoryList)){
+        const categoryObjects: Array<Category> = response.data;
+
+        if (!equals(categoryObjects, categoryList)) {
           setCategoryList(categoryObjects);
         }
-        console.log(categoryList)
       },
       (error) => {
         setErrorFlag(true);
