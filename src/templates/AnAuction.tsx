@@ -56,7 +56,7 @@ export default function AnAuction() {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -79,7 +79,7 @@ export default function AnAuction() {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -93,7 +93,7 @@ export default function AnAuction() {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -131,7 +131,7 @@ export default function AnAuction() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };
@@ -147,7 +147,7 @@ export default function AnAuction() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };

@@ -88,7 +88,7 @@ const MyAuctions = () => {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -115,7 +115,7 @@ const MyAuctions = () => {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };
@@ -144,7 +144,7 @@ const MyAuctions = () => {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };

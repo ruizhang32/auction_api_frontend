@@ -46,7 +46,7 @@ export default function MultipleSelectCheckmarks(props: IMultipleSelectProps) {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };

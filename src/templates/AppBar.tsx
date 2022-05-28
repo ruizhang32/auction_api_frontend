@@ -34,7 +34,7 @@ export default function AppBar() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
     }

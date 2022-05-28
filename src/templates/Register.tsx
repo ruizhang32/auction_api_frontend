@@ -65,7 +65,7 @@ export default function Register() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };

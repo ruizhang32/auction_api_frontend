@@ -63,7 +63,7 @@ export default function SignIn() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };

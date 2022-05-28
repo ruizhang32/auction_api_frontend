@@ -9,7 +9,7 @@ import React from "react";
 import { Navigate, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import {
-  Alert,
+  Alert, AlertTitle,
   Dialog,
   DialogActions,
   DialogContent,
@@ -28,12 +28,6 @@ export default function UserForm() {
   const [lastName, setLastName] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
   const [password, setPassword] = React.useState<string>("");
-  // const [user, setUser] = React.useState<User>({
-  //   firstName: "",
-  //   lastName: "",
-  //   email: "",
-  //   password: "",
-  // });
   const [myFirstName, setMyFirstName] = React.useState<string>("");
   const [myLastName, setMyLastName] = React.useState<string>("");
   const [myEmail, setMyEmail] = React.useState<string>("");
@@ -67,8 +61,6 @@ export default function UserForm() {
     console.log(sellerId);
     axios.get("http://localhost:4941/api/v1/users/" + sellerId, config).then(
       (response) => {
-        setErrorFlag(false);
-        setErrorMessage("");
         const myUser: User = response.data;
         setFirstName(myUser.firstName);
         setMyFirstName(myUser.firstName);
@@ -78,25 +70,15 @@ export default function UserForm() {
           setEmail(myUser.email);
           setMyEmail(myUser.email);
         }
-        // setUser(myUser);
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
 
-  // const editFirstName = (myFirstName: String) => {
-  //   return {
-  //     firstName: myFirstName,
-  //     lastName: "",
-  //     email: "",
-  //     password: "",
-  //   };
-  // }
   const patchUserProfile = () => {
-
     const bodyParameters = {
       firstName: myFirstName,
       lastName: myLastName,
@@ -113,12 +95,13 @@ export default function UserForm() {
           setErrorMessage("");
           if (response.status === 200) {
             getUser();
+            setOpen(false);
           }
         },
         (error) => {
           getUser();
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };
@@ -142,7 +125,7 @@ export default function UserForm() {
   //       },
   //       (error) => {
   //         setErrorFlag(true);
-  //         setErrorMessage(error.toString());
+  //         setErrorMessage(error.response.statusText);
   //       }
   //     );
   // };
@@ -329,6 +312,12 @@ export default function UserForm() {
               <Button onClick={handleClose}>Cancel</Button>
               <Button onClick={patchUserProfile}>Summit</Button>
             </DialogActions>
+            <div hidden={!errorFlag}>
+              <Alert severity="error">
+                <AlertTitle>Error</AlertTitle>
+                <strong>{errorMessage}</strong>
+              </Alert>
+            </div>
           </Dialog>
         </div>
       </Paper>

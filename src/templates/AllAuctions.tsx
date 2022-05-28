@@ -144,7 +144,7 @@ const AllAuctions = (props: IAuctionsProps) => {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -159,7 +159,7 @@ const AllAuctions = (props: IAuctionsProps) => {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };

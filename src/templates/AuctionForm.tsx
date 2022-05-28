@@ -180,7 +180,7 @@ export default function AuctionForm() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };
@@ -244,7 +244,7 @@ export default function AuctionForm() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
       );
   };
@@ -261,7 +261,7 @@ export default function AuctionForm() {
         },
         (error) => {
           setErrorFlag(true);
-          setErrorMessage(error.toString());
+          setErrorMessage(error.response.statusText);
         }
     );
   };
@@ -329,7 +329,7 @@ export default function AuctionForm() {
       },
       (error) => {
         setErrorFlag(true);
-        setErrorMessage(error.toString());
+        setErrorMessage(error.response.statusText);
       }
     );
   };
@@ -382,7 +382,7 @@ export default function AuctionForm() {
   //       },
   //       (error) => {
   //         setErrorFlag(true);
-  //         setErrorMessage(error.toString());
+  //         setErrorMessage(error.response.statusText);
   //       }
   //     );
   // };
