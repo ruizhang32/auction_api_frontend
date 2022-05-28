@@ -1,14 +1,23 @@
+import React from "react";
 import Container from "@mui/material/Container";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 
-export default function HeroUnit() {
+interface IHeroUnitProps {
+  searchKeyWords: string[];
+  setSearchKeyWords: Function;
+}
+
+export default function HeroUnit(props: IHeroUnitProps) {
+  console.log(props.searchKeyWords);
+
   return (
     <Container
       disableGutters
-      maxWidth="sm"
+      maxWidth="md"
       component="main"
-      sx={{ pt: 8, pb: 6 }}
+      // pt	padding-top, pb	padding-bottom
+      sx={{ pt: 2, pb: 2 }}
     >
       <Typography
         component="h1"
@@ -34,7 +43,10 @@ export default function HeroUnit() {
           id="outlined-basic"
           label="Search an Auction"
           variant="outlined"
-          style={{ width: 600 }}
+          style={{ width: 900 }}
+          value={props.searchKeyWords}
+          onChange={(e) => props.setSearchKeyWords(e.target.value)}
+          sx={{ pt: 2 }}
         />
       </div>
     </Container>

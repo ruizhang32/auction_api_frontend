@@ -1,14 +1,14 @@
 import React from "react";
 import AppBar from "../templates/AppBar";
-import SignIn from "../templates/SignIn";
+import Register from "../templates/Register";
 
-const Register = () => {
+const RegisterPage = () => {
   return (
     <React.Fragment>
       <AppBar></AppBar>
-      <SignIn></SignIn>
+      <Register></Register>
     </React.Fragment>
   );
 };
 
-export default Register;
+export default RegisterPage;

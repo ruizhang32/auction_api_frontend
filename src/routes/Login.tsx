@@ -1,12 +1,12 @@
 import React from "react";
 import AppBar from "../templates/AppBar";
-import SignUp from "../templates/SignUp";
+import SignIn from "../templates/SignIn";
 
 const Login = () => {
   return (
     <React.Fragment>
       <AppBar></AppBar>
-      <SignUp></SignUp>
+      <SignIn></SignIn>
     </React.Fragment>
   );
 };

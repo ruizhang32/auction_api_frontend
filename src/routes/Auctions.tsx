@@ -1,59 +1,73 @@
-import { useSearchParams, NavLink, Outlet } from "react-router-dom";
-import { getAuctions } from "../data";
-import { Button } from "../stories/Button";
-import { LoggedIn } from "../stories/Header.stories";
-import MainPage from "../templates/MainPage";
+import React from "react";
+import AllAuctions from "../templates/AllAuctions";
+import AppBar from "../templates/AppBar";
+import Container from "@mui/material/Container";
+import Footer from "../templates/Footer";
+import HeroUnit from "../templates/HeroUnit";
+import PaginationRounded from "../templates/Pagination";
+import Grid from "@mui/material/Grid";
+import MultipleSelectChip from "../templates/MultipleSelect";
+import SelectStatus from "../templates/SelectStatus";
+import SelectSortKeyWord from "../templates/SelectSortKeyWord";
+
 const Auctions = () => {
-  // let auctions = getAuctions();
-  // let [searchParams, setSearchParams] = useSearchParams();
-  //
-  // return (
-  //   <div style={{ display: "flex" }}>
-  //     <nav
-  //       style={{
-  //         borderRight: "solid 1px",
-  //         padding: "1rem",
-  //       }}
-  //     >
-  //       <input
-  //         value={searchParams.get("filter") || ""}
-  //         onChange={(event) => {
-  //           let filter = event.target.value;
-  //           if (filter) {
-  //             setSearchParams({ filter });
-  //           } else {
-  //             setSearchParams({});
-  //           }
-  //         }}
-  //       />
-  //
-  //       {auctions
-  //         .filter((auction) => {
-  //           let filter = searchParams.get("filter");
-  //           if (!filter) return true;
-  //           let name = auction.name.toLowerCase();
-  //           return name.startsWith(filter.toLowerCase());
-  //         })
-  //         .map((auction) => (
-  //           <NavLink
-  //             style={({ isActive }) => ({
-  //               display: "block",
-  //               margin: "1rem 0",
-  //               color: isActive ? "red" : "",
-  //             })}
-  //             to={`/auctions/${auction.number}`}
-  //             key={auction.number}
-  //           >
-  //             {auction.name}
-  //           </NavLink>
-  //         ))}
-  //     </nav>
-  //     <Outlet />
-  //   </div>
-  // );
+  const [searchKeyWords, setSearchKeyWords] = React.useState<Array<string>>([]);
+  const [selectedCategoryIdList, setSelectedCategoryIdList] = React.useState<
+    Array<string>
+  >([]);
+  const [status, setStatus] = React.useState<string>("");
+  const [sortKeyWord, setSortKeyWord] = React.useState<string>("");
+  const [sortOrder, setSortOrder] = React.useState<string>("");
+  const [pageNumber, setPageNumber] = React.useState<number>(1);
+  const [maxPageNumber, setMaxPageNumber] = React.useState<number>(0);
+
   return (
-    <main style={{ padding: "1rem 0" }}>
-      <MainPage></MainPage>
+    <main>
+      <AppBar></AppBar>
+      <HeroUnit
+        searchKeyWords={searchKeyWords}
+        setSearchKeyWords={setSearchKeyWords}
+      ></HeroUnit>
+      <Container sx={{ pb: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <MultipleSelectChip
+              selectedCategoryIdList={selectedCategoryIdList}
+              setSelectedCategoryIdList={setSelectedCategoryIdList}
+            ></MultipleSelectChip>
+          </Grid>
+          <Grid item xs={4}>
+            <SelectStatus status={status} setStatus={setStatus}></SelectStatus>
+          </Grid>
+          <Grid item xs={4}>
+            <SelectSortKeyWord
+              sortKeyWord={sortKeyWord}
+              setSortKeyWord={setSortKeyWord}
+              sortOrder={sortOrder}
+              setSortOrder={setSortOrder}
+            ></SelectSortKeyWord>
+          </Grid>
+        </Grid>
+      </Container>
+      <AllAuctions
+        searchKeyWords={searchKeyWords}
+        selectedCategoryIdList={selectedCategoryIdList}
+        status={status}
+        sortKeyWord={sortKeyWord}
+        sortOrder={sortOrder}
+        pageNumber={pageNumber}
+        maxPageNumber={maxPageNumber}
+        setMaxPageNumber={setMaxPageNumber}
+      ></AllAuctions>
+      <div>
+        <PaginationRounded
+          pageNumber={pageNumber}
+          setPageNumber={setPageNumber}
+          maxPageNumber={maxPageNumber}
+        ></PaginationRounded>
+      </div>
+
+      <Footer></Footer>
     </main>
   );
 };
