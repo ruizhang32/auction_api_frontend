@@ -44,6 +44,8 @@ export default function UserForm() {
   const [open, setOpen] = React.useState(false);
   const sellerId = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("token");
+  const config = {headers: { "X-Authorization": `${token}` },
+  };
 
   React.useEffect(() => {
     getUser();
@@ -55,15 +57,20 @@ export default function UserForm() {
       "email:",
       email
     );
-  }, []);
+  }, [firstName, lastName, email, password]);
 
   const getUser = () => {
-    axios.get("http://localhost:4941/api/v1/users/" + sellerId).then(
+    console.log(sellerId);
+    axios.get("http://localhost:4941/api/v1/users/" + sellerId, config).then(
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        setFirstName(response.data["firstName"]);
-        setLastName(response.data["lastName"]);
+        const myUser:User = response.data
+        setFirstName(myUser.firstName);
+        setLastName(myUser.lastName);
+        if(myUser.email !== undefined){
+          setEmail(myUser.email);
+        }
       },
       (error) => {
         setErrorFlag(true);
@@ -72,20 +79,25 @@ export default function UserForm() {
     );
   };
 
-  // const patchUserProfile = () => {
-  //   const config = {
-  //     headers: { "X-Authorization": `${token}` },
-  //   };
-  //
-  //   const bodyParameters = {
-  //     firstName: "",
+  // const editFirstName = (myFirstName: String) => {
+  //   return {
+  //     firstName: myFirstName,
   //     lastName: "",
   //     email: "",
   //     password: "",
   //   };
+  // }
+  // const patchUserProfile = (bodyParameters : User) => {
+  //
+  //   // const bodyParameters = {
+  //   //   firstName: "",
+  //   //   lastName: "",
+  //   //   email: "",
+  //   //   password: "",
+  //   // };
   //
   //   axios
-  //     .patch("http://localhost:4941/api/v1/auctions/", bodyParameters, config)
+  //     .patch("http://localhost:4941/api/v1/users/" + sellerId, bodyParameters, config)
   //     .then(
   //       (response) => {
   //         setErrorFlag(false);
@@ -225,7 +237,7 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h6" component="div" gutterBottom>
-                {user.firstName}
+                {firstName}
               </Typography>
             </Grid>
             <Grid item xs={3}>
@@ -268,7 +280,7 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h6" component="div" gutterBottom>
-                {user.lastName}
+                {lastName}
               </Typography>
             </Grid>
             <Grid item xs={3}>
@@ -311,7 +323,7 @@ export default function UserForm() {
             </Grid>
             <Grid item xs={3}>
               <Typography variant="h6" component="div" gutterBottom>
-                {user.email}
+                {email}
               </Typography>
             </Grid>
             <Grid item xs={3}>
