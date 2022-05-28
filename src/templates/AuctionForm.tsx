@@ -12,6 +12,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import isAFutureDate from "../Validation/InputValidation";
 import MultipleSelectChip from "../templates/MultipleSelect";
+import equals from "../Utility/util";
 
 export default function AuctionForm() {
   let file = new File([new Blob()], "default image");
@@ -62,6 +63,10 @@ export default function AuctionForm() {
   React.useEffect(() => {
     getCategories();
     // getCategoryIdByName();
+    if(auctionId !== undefined && parseInt(auctionId) > 0){
+      getAnAuction();
+      setMyAuction(auction);
+    }
     console.log(
       "selectedCategoryIdList: ",
       selectedCategoryIdList,
@@ -72,7 +77,7 @@ export default function AuctionForm() {
       "reserve:",
       reservePrice,
       "endDate:",
-      date.toISOString().replace("T", " ").substring(0, 19),
+      // date.toISOString().replace("T", " ").substring(0, 19),
       "description:",
       description,
       "sellerId:",
@@ -115,7 +120,7 @@ export default function AuctionForm() {
       sellerId: sellerId,
     };
 
-    // check if any required input is not validated
+    // check if any input is not validated
     // if not validated, show the hidden alert to user
 
     // Title must not be empty
@@ -244,6 +249,34 @@ export default function AuctionForm() {
       );
   };
 
+  const getAnAuction = () => {
+    axios.get("http://localhost:4941/api/v1/auctions/" + auctionId).then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+          const myAction : Auction = response.data;
+          if(!equals(myAction, auction)){
+            setAuction(myAction);
+          }
+        },
+        (error) => {
+          setErrorFlag(true);
+          setErrorMessage(error.toString());
+        }
+    );
+  };
+
+  const setMyAuction = (auction: Auction) =>{
+    setAuctionTitle(auction.title);
+    const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
+    if(myCategory !== undefined){
+      setAuctionCategory(myCategory.name);
+    }
+    setDate(new Date(auction.endDate));
+    setDescription(auction.description);
+    setReservePrice(auction.reserve.toString());
+  }
+
   // const searchId = (value: string, myArray: Array<Category>) => {
   //   for (let i = 0; i < myArray.length; i++) {
   //     if (myArray[i].name === value) {
@@ -279,8 +312,12 @@ export default function AuctionForm() {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        const categoryObjects = response.data;
-        setCategoryList(categoryObjects);
+        const categoryObjects : Array<Category> = response.data;
+        console.log(categoryObjects)
+        if(!equals(categoryObjects, categoryList)){
+          setCategoryList(categoryObjects);
+        }
+        console.log(categoryList)
       },
       (error) => {
         setErrorFlag(true);
@@ -302,7 +339,7 @@ export default function AuctionForm() {
       target: { value },
     } = event;
     setCategoryNames(
-      // On autofill we get a stringified value.
+      // On auto fill we get a string type value.
       typeof value === "string" ? value.split(",") : value
     );
   };

@@ -103,8 +103,7 @@ const MyAuctions = () => {
 
   // TODO: change the url
   const getBids = () => {
-    axios
-      .get("http://localhost:4941/api/v1/auctions/" + loggedInUserId + "/bids")
+    axios.get("http://localhost:4941/api/v1/auctions/" + loggedInUserId + "/bids")
       .then(
         (response) => {
           setErrorFlag(false);
@@ -141,6 +140,7 @@ const MyAuctions = () => {
           setErrorFlag(false);
           setErrorMessage("");
           setOpenDeleteDialog(false);
+          getAuctions();
         },
         (error) => {
           setErrorFlag(true);
