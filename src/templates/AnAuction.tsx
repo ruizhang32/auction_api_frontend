@@ -1,4 +1,5 @@
 import { Paper, Table } from "@mui/material";
+import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -30,8 +31,11 @@ export default function AnAuction() {
   });
   const [auctionBidders, setAuctionBidders] = React.useState<Array<Bid>>([]);
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
+  const [isBidSuccessful, setIsBidSuccessful] = React.useState<boolean>(false);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const token = sessionStorage.getItem("token");
+  const userId = sessionStorage.getItem("userId");
 
   React.useEffect(() => {
     getAuctions();
@@ -39,6 +43,7 @@ export default function AnAuction() {
     getCategories();
     getAuctionBidders();
     getSimilarAuctions();
+    console.log("auctionBidders: ", auctionBidders);
   }, [auctionId]);
 
   // return a category list, each element is a dictionary, e.g: {"id":7,"name":"Bicycles"}
@@ -93,6 +98,44 @@ export default function AnAuction() {
     );
   };
 
+  const postAnBid = () => {
+    const config = {
+      headers: { "X-Authorization": `${token}` },
+    };
+
+    const bodyParameter = {
+      amount: 0,
+    };
+
+    bodyParameter["amount"] = parseFloat(bidAmount);
+
+    axios
+      .post(
+        "http://localhost:4941/api/v1/auctions/" + auctionId + "/bids",
+        bodyParameter,
+        config
+      )
+      .then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+          // if (response.status === 400) {
+          //   //setWarning("Invalid bid amount");
+          // }
+          // else if (response.status === 403) {
+          //   setWarning(response.statusMessage);
+          // }
+          setBidAmount("");
+          // setIsBidSuccessful(true);
+          getAuctionBidders();
+        },
+        (error) => {
+          setErrorFlag(true);
+          setErrorMessage(error.toString());
+        }
+      );
+  };
+
   const getAuctionBidders = () => {
     axios
       .get("http://localhost:4941/api/v1/auctions/" + auctionId + "/bids")
@@ -110,14 +153,18 @@ export default function AnAuction() {
   };
 
   const bidsSortedByTimestamp: Bid[] = auctionBidders.sort((a, b) => {
-    return (
-      Date.parse(
-        b["timestamp"].substring(0, 11) + b["timestamp"].substring(11, 19)
-      ) -
-      Date.parse(
-        a["timestamp"].substring(0, 11) + a["timestamp"].substring(11, 19)
-      )
-    );
+    if (auctionBidders !== []) {
+      return (
+        Date.parse(
+          b["timestamp"].substring(0, 11) + b["timestamp"].substring(11, 19)
+        ) -
+        Date.parse(
+          a["timestamp"].substring(0, 11) + a["timestamp"].substring(11, 19)
+        )
+      );
+    } else {
+      return 0;
+    }
   });
 
   const bidsSortedByBidAmount: Bid[] = auctionBidders.sort((a, b) => {
@@ -126,10 +173,11 @@ export default function AnAuction() {
 
   const getCurrentBid = () => {
     if (bidsSortedByTimestamp.length !== 0) {
+      console.log("bidsSortedByTimestamp: ", bidsSortedByTimestamp);
       return (
-        bidsSortedByTimestamp[1]["timestamp"].substring(0, 10) +
+        bidsSortedByTimestamp[0]["timestamp"].substring(0, 10) +
         " " +
-        bidsSortedByTimestamp[1]["timestamp"].substring(11, 19)
+        bidsSortedByTimestamp[0]["timestamp"].substring(11, 19)
       );
     }
     return "";
@@ -149,7 +197,6 @@ export default function AnAuction() {
     <React.Fragment>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          {/*<Container sx={{ width: "100%", maxWidth: 500 }}>*/}
           <Box
             sx={{
               backgroundColor: "#cfe8fc",
@@ -157,18 +204,19 @@ export default function AnAuction() {
               ml: 10,
               mr: 10,
               align: "center",
+              width: 900,
+              height: 500,
             }}
           >
             <img
-              // TODO: change scr to actual auction image address
               src={
                 "http://localhost:4941/api/v1/auctions/" +
                 auction.auctionId +
                 "/image"
               }
               alt="auction image"
-              width="60%"
-              height={400}
+              width="100%"
+              height="100%"
             />
           </Box>
           <Typography
@@ -190,28 +238,72 @@ export default function AnAuction() {
               {auction.endDate.substring(0, 10)}{" "}
               {auction.endDate.substring(11, 19)}
             </Typography>
-            {/*TODO: change "2022-05-01" to Date.now()*/}
-            <Typography variant="h6" component="div" gutterBottom>
-              {(Date.parse("2022-05-10") -
-                Date.parse(auction.endDate.toString().substring(0, 10))) /
-                (60 * 1000 * 60 * 24)}{" "}
+
+            <Typography
+              variant="h6"
+              component="div"
+              gutterBottom
+              sx={{ mb: 3 }}
+            >
+              {Math.ceil(
+                (Date.parse(auction.endDate.toString().substring(0, 10)) -
+                  Date.now()) /
+                  (60 * 1000 * 60 * 24)
+              )}{" "}
               days left
             </Typography>
-            <Typography variant="body1" component="div" gutterBottom>
-              Description: {auction.description}
+            <Typography variant="h5" component="div" gutterBottom>
+              Description:
             </Typography>
-            <Typography variant="body1" component="div" gutterBottom>
+            <Typography
+              variant="body1"
+              component="div"
+              gutterBottom
+              sx={{ mb: 3 }}
+            >
+              {auction.description}
+            </Typography>
+            <Typography variant="h5" component="div" gutterBottom>
               Category:
+            </Typography>
+            <Typography
+              variant="body1"
+              component="div"
+              gutterBottom
+              sx={{ mb: 3 }}
+            >
               {getCategoryName(auction.categoryId)}
             </Typography>
-            <Typography variant="body1" component="div" gutterBottom>
+
+            <Typography variant="h5" component="div" gutterBottom>
               Seller:
-              {/*TODO: seller image*/}
-              {auction.sellerFirstName}
-              {auction.sellerLastName}
             </Typography>
-            <Typography variant="body1" component="div" gutterBottom>
+            <Grid container spacing={2} sx={{ mb: 3 }}>
+              <Grid item xs={2}>
+                <Avatar
+                  alt="User Image"
+                  src={
+                    "http://localhost:4941/api/v1/users/" +
+                    auction.sellerId +
+                    "/image"
+                  }
+                  sx={{ width: 100, height: 100 }}
+                />
+              </Grid>
+              <Grid item xs={4}>
+                {auction.sellerFirstName} {auction.sellerLastName}
+              </Grid>
+            </Grid>
+
+            <Typography variant="h5" component="div" gutterBottom>
               Reserve:
+            </Typography>
+            <Typography
+              variant="body1"
+              component="div"
+              gutterBottom
+              sx={{ mb: 3 }}
+            >
               {auction.reserve}
             </Typography>
           </Container>
@@ -255,7 +347,17 @@ export default function AnAuction() {
                       <td align={"left"}>{auctionBidder.amount}</td>
                       <td align={"left"}>{auctionBidder.firstName}</td>
                       <td align={"left"}>{auctionBidder.lastName}</td>
-                      <td align={"left"}>image</td>
+                      <td align={"left"}>
+                        <Avatar
+                          alt="User Image"
+                          src={
+                            "http://localhost:4941/api/v1/users/" +
+                            auctionBidder.bidderId +
+                            "/image"
+                          }
+                          sx={{ width: 35, height: 35 }}
+                        />
+                      </td>
                       <td align={"left"}>
                         {auctionBidder.timestamp.substring(0, 10)}
                         {auctionBidder.timestamp.substring(11, 19)}
@@ -291,7 +393,12 @@ export default function AnAuction() {
               value={bidAmount}
               onChange={(e) => setBidAmount(e.target.value)}
             />
-            <Button variant="contained" size="large" sx={{ ml: 2, mt: 1 }}>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{ ml: 2, mt: 1 }}
+              onClick={postAnBid}
+            >
               Place bid
             </Button>
           </Container>
