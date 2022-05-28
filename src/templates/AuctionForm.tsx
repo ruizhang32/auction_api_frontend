@@ -12,7 +12,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import isAFutureDate from "../Validation/InputValidation";
 import MultipleSelectChip from "../templates/MultipleSelect";
-import equals from "../Utility/util";
+import equals, {defaultImageUrl} from "../Utility/util";
 
 export default function AuctionForm() {
   // let file = new File([new Blob()], "default image");
@@ -22,7 +22,7 @@ export default function AuctionForm() {
   const [description, setDescription] = React.useState<string>("");
   const [reservePrice, setReservePrice] = React.useState<string>("");
   const [auctionCategory, setAuctionCategory] = React.useState<string>("");
-  const [auctionImage, setAuctionImage] = React.useState<string>("https://lh3.googleusercontent.com/fife/AAWUweXkN_Mk_JRryWVGTFpg1P7wOTIzoXOUNDs2USwnvmHbloaLYoiVM_BzXEAx2P0HZC_02mxI0G2MSzj_gxinWHlQJvri2FXn6lNfSZVih7OzN7b572ZTrwGxwR2S01Z352v2ejNbNdP4XtpgUzhVwUMLJPH9J84KDZWegt1BpugJNe4M-sxZFdQa7Jnp5So-x5Fo_NvPa7rfMvahAzv7bJm6_-Le-VjVvC4_alLonC5Y9WGClsOkCEyj7EtuUO3TscW-UQjMS1PD32k331cF-lmAvWqhGY9ZWyXrWJhPOGs8W6MU_e5O0OzS9xweqb80rYkjfUBmAD7kpiS-WuzuhgvCR_s1ywYmTK-h40v67ep2ucm3wcFI7AK2L3f9Mjt5yR95ARl0gMRk914ebM1DSuOQkhT4DF3Tc09fBgKraoGOWj5hikVl4JoBD0zJXn0Wk5f-vJ2w9rpw2AhYjjZF3zZH9BqWfNjIZoF-tZYGI_-wzcvEbDSGXA_t2-oyMqib_1fO9W4933mrPCZiyVWcwFX6pOBCTEXGX5B3PFQX1SZ8aSjvt71DcIY5b2tvRskQFAu5blKTnmLLAz5giMfWzxgmp-UHtulGIQ-sGc0yeHhoFmrv5jiSUJZHs5QmA0omqmUSJyCVZi3RH_REXhEWSyhB50lZ--ps6EYt82c-BN0yfsMU4Z5fVHomudXTdXy8umj84ANvp3PB5Y7veyi944uAzJmrW_jvzHH38pz0R0245z1iGxCdsVHzRu6-qq7VwPZEKuLv7XdlvnsDIyppljx7p6E5wppqZE5C8ooO0wldz8ES4GzPgRjlM39E3uahrTQf6Wvvju2kl2XPllteEfo7HVn_bsaf8gsnAaB-JfC-fhzFiDUQF0ke8GOHQj_EaIFkqntT_qT2mSsggjHqfkCnJJZa7a5GTxQKLUvU75DAtRbTCYxWur9AL3J2iWd6MMdQ3wV9NvsXC9zhFEowaRW98wpOG9L53zAkdab5Ap0hAr9bcEFyA2-4hmnu7gWzGFRQEYQwY7VKg0pyJDFKDls00hYvSaA-zCYHp3Bol57y21iEKFetGA-hpLE5iHubxcR_RMmJdb46pUCWOSNX-HbsiVvxH8goqT5yEqtt6Vb9I6q9pR_vDLGneXV5phIUhPgmPyIoElGthu9v00DZEAVPiB2eZs1DOeJCGawW8hFfOXIv9WXnrRpVEQRT2pg5s6HIgNjscnnkNUJcwYVvlxb1nGy6P0gIWkQWY_QzI_jkRxNmAEh1ISAgFCIUbhbPbDJsc9UFM9qbYhKSBU5vuoSd6LSuv-lEXCSLL2Gfwgki_jAIl11yYLfqr2ieq3Cm5SrOROhkJnJAEZpJ9gb5C0jePgTPHKeLXEpoAzBNW_L5gIVORlT-h_BP0hxW9-sMMlcI5GMh_maoskoV_ogMROPi3Wgz5rlgS0tU-EI=w720-h405?authuser=0");
+  const [auctionImage, setAuctionImage] = React.useState<string>(defaultImageUrl);
   const [categoryId, setCategoryId] = React.useState<string>();
   const [selectedCategoryIdList, setSelectedCategoryIdList] = React.useState<
     Array<string>
