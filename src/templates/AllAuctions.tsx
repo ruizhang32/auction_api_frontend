@@ -186,14 +186,27 @@ const AllAuctions = (props: IAuctionsProps) => {
         <Grid container spacing={2}>
           {auctions.map((auction, i) => (
             <Grid item xs={4} key={i}>
-              <Card sx={{ maxWidth: 345, backgroundColor: "#F2F2C3" }}>
-                <CardHeader
-                  title={auction.title}
-                  titleTypographyProps={{ align: "center" }}
-                ></CardHeader>
+              <Card
+                sx={{
+                  maxWidth: 400,
+                  Height: 600,
+                  backgroundColor: "#F2F2C3",
+                }}
+              >
+                <Container
+                  sx={{
+                    height: 95,
+                    align: "center",
+                  }}
+                >
+                  <CardHeader
+                    title={auction.title}
+                    titleTypographyProps={{ align: "center" }}
+                  ></CardHeader>
+                </Container>
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="240"
                   image={
                     "http://localhost:4941/api/v1/auctions/" +
                     auction.auctionId +
@@ -202,69 +215,60 @@ const AllAuctions = (props: IAuctionsProps) => {
                   alt={auction.image_filename}
                 ></CardMedia>
                 <CardContent>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "left",
-                      alignItems: "baseline",
-                      mb: 2,
-                    }}
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    component="div"
                   >
-                    <li>
-                      <Typography
-                        variant="body1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        {/*TODO: change 2022-05-01*/}
-                        {(Date.parse(
-                          auction.endDate.toString().substring(0, 10)
-                        ) -
-                          Date.parse("2022-05-01")) /
-                          (60 * 1000 * 60 * 24) ===
-                        1
-                          ? "closes tmr"
-                          : "closes in " +
-                            (Date.parse(
-                              auction.endDate.toString().substring(0, 10)
-                            ) -
-                              Date.parse("2022-05-01")) /
-                              (60 * 1000 * 60 * 24) +
-                            " days"}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        Category:
-                        {getCategoryName(auction.categoryId)}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        Seller: {auction.sellerFirstName}
-                        {auction.sellerLastName}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        Highest Bid:{" "}
-                        {auction.highestBid === null ? 0 : auction.highestBid}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        Reserve: {auction.reserve}
-                      </Typography>
-                    </li>
-                  </Box>
+                    {(Date.parse(auction.endDate.toString().substring(0, 10)) -
+                      Date.now()) /
+                      (60 * 1000 * 60 * 24) ===
+                    1
+                      ? "closes tmr"
+                      : "closes in " +
+                        Math.ceil(
+                          (Date.parse(
+                            auction.endDate.toString().substring(0, 10)
+                          ) -
+                            Date.now()) /
+                            (60 * 1000 * 60 * 24)
+                        ) +
+                        " days"}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    component="div"
+                  >
+                    Category:
+                    {getCategoryName(auction.categoryId)}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    component="div"
+                  >
+                    Seller: {auction.sellerFirstName}
+                    {auction.sellerLastName}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    component="div"
+                  >
+                    Highest Bid:{" "}
+                    {auction.highestBid === null ? 0 : auction.highestBid}
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    color="text.primary"
+                    component="div"
+                  >
+                    Reserve Price: {auction.reserve}
+                    {auction.highestBid >= auction.reserve
+                      ? " (on the market)"
+                      : ""}
+                  </Typography>
                 </CardContent>
                 <CardActions>
                   <Link to={"/auctions/" + auction.auctionId}>

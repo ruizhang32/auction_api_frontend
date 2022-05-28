@@ -13,6 +13,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 export default function AnAuction() {
   const { auctionId } = useParams();
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
+  const [bidAmount, setBidAmount] = React.useState<string>("");
   const [auction, setAuction] = React.useState<Auction>({
     auctionId: 0,
     title: "",
@@ -284,7 +285,12 @@ export default function AnAuction() {
             >
               Your bid
             </Typography>
-            <TextField id="outlined-basic" variant="outlined" />
+            <TextField
+              id="outlined-basic"
+              variant="outlined"
+              value={bidAmount}
+              onChange={(e) => setBidAmount(e.target.value)}
+            />
             <Button variant="contained" size="large" sx={{ ml: 2, mt: 1 }}>
               Place bid
             </Button>

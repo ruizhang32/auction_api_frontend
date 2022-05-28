@@ -29,17 +29,17 @@ const Auctions = () => {
         setSearchKeyWords={setSearchKeyWords}
       ></HeroUnit>
       <Container sx={{ pb: 2 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
+        <Grid container spacing={1} sx={{ width: 1140 }}>
+          <Grid item xs={3}>
             <MultipleSelectChip
               selectedCategoryIdList={selectedCategoryIdList}
               setSelectedCategoryIdList={setSelectedCategoryIdList}
             ></MultipleSelectChip>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <SelectStatus status={status} setStatus={setStatus}></SelectStatus>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={6}>
             <SelectSortKeyWord
               sortKeyWord={sortKeyWord}
               setSortKeyWord={setSortKeyWord}
