@@ -44,8 +44,7 @@ export default function UserForm() {
   const [open, setOpen] = React.useState(false);
   const sellerId = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("token");
-  const config = {headers: { "X-Authorization": `${token}` },
-  };
+  const config = { headers: { "X-Authorization": `${token}` } };
 
   React.useEffect(() => {
     getUser();
@@ -65,10 +64,10 @@ export default function UserForm() {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        const myUser:User = response.data
+        const myUser: User = response.data;
         setFirstName(myUser.firstName);
         setLastName(myUser.lastName);
-        if(myUser.email !== undefined){
+        if (myUser.email !== undefined) {
           setEmail(myUser.email);
         }
       },
@@ -151,43 +150,12 @@ export default function UserForm() {
     //putUserProfile();
   };
 
-  // TODO: refactor code to one function
-  const handleFirstNameClickOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setFirstNameOpen(true);
+  const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setOpen(true);
   };
 
-  const handleFirstNameClose = () => {
-    setFirstNameOpen(false);
-  };
-
-  const handleLastNameClickOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setLastNameOpen(true);
-  };
-
-  const handleFirstNameChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-  ) => {
-    setFirstName(e.target.value);
-  };
-
-  const handleLastNameClose = () => {
-    setLastNameOpen(false);
-  };
-
-  const handleEmailClickOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setEmailOpen(true);
-  };
-
-  const handleEmailClose = () => {
-    setEmailOpen(false);
-  };
-
-  const handlePasswordClickOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
-    setPasswordOpen(true);
-  };
-
-  const handlePasswordClose = () => {
-    setPasswordOpen(false);
+  const handleClose = () => {
+    setOpen(false);
   };
 
   // if (auctionIsUpdated) {
@@ -231,7 +199,12 @@ export default function UserForm() {
         <div>
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6}>
-              <Typography variant="h6" component="div" gutterBottom>
+              <Typography
+                variant="h6"
+                component="div"
+                gutterBottom
+                color="purple"
+              >
                 First Name
               </Typography>
             </Grid>
@@ -240,41 +213,17 @@ export default function UserForm() {
                 {firstName}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
-              <Button
-                variant={"outlined"}
-                value={firstName}
-                onClick={handleFirstNameClickOpen}
-              >
-                Edit First Name
-              </Button>
-              <Dialog open={firstNameOpen} onClose={handleFirstNameClose}>
-                <DialogTitle>Edit First Name</DialogTitle>
-                <DialogContent>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="firstName"
-                    label="firstName"
-                    type="firstName"
-                    value={firstName}
-                    onChange={handleFirstNameChange}
-                    sx={{ width: 300 }}
-                    variant="outlined"
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleFirstNameClose}>Cancel</Button>
-                  <Button onClick={handleFirstNameClose}>Summit</Button>
-                </DialogActions>
-              </Dialog>
-            </Grid>
           </Grid>
         </div>
         <div>
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6}>
-              <Typography variant="h6" component="div" gutterBottom>
+              <Typography
+                variant="h6"
+                component="div"
+                gutterBottom
+                color="purple"
+              >
                 Last Name
               </Typography>
             </Grid>
@@ -283,41 +232,17 @@ export default function UserForm() {
                 {lastName}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
-              <Button
-                variant={"outlined"}
-                value={lastName}
-                onClick={handleLastNameClickOpen}
-              >
-                Edit Last Name
-              </Button>
-              <Dialog open={lastNameOpen} onClose={handleLastNameClose}>
-                <DialogTitle>Edit Last Name</DialogTitle>
-                <DialogContent>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="lastName"
-                    label="lastName"
-                    type="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    sx={{ width: 300 }}
-                    variant="outlined"
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleLastNameClose}>Cancel</Button>
-                  <Button onClick={handleLastNameClose}>Summit</Button>
-                </DialogActions>
-              </Dialog>
-            </Grid>
           </Grid>
         </div>
         <div>
           <Grid container spacing={2} sx={{ mb: 3 }}>
             <Grid item xs={6}>
-              <Typography variant="h6" component="div" gutterBottom>
+              <Typography
+                variant="h6"
+                component="div"
+                gutterBottom
+                color="purple"
+              >
                 Email
               </Typography>
             </Grid>
@@ -326,74 +251,65 @@ export default function UserForm() {
                 {email}
               </Typography>
             </Grid>
-            <Grid item xs={3}>
-              <Button
-                variant={"outlined"}
-                value={email}
-                onClick={handleEmailClickOpen}
-              >
-                Edit Email
-              </Button>
-              <Dialog open={emailOpen} onClose={handleEmailClose}>
-                <DialogTitle>Edit Email</DialogTitle>
-                <DialogContent>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="email"
-                    label="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    sx={{ width: 300 }}
-                    variant="outlined"
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handleEmailClose}>Cancel</Button>
-                  <Button onClick={handleEmailClose}>Summit</Button>
-                </DialogActions>
-              </Dialog>
-            </Grid>
           </Grid>
         </div>
         <div>
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={9}>
-              <Typography variant="h6" component="div" gutterBottom>
-                Password
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Button
-                variant={"outlined"}
+          <Button variant={"outlined"} value={password} onClick={handleOpen}>
+            Edit
+          </Button>
+          <Dialog open={open} onClose={handleClose}>
+            <DialogTitle>Edit Profile</DialogTitle>
+            <DialogContent>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="firstName"
+                label="firstName"
+                type="firstName"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                sx={{ width: 300 }}
+                variant="outlined"
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="lastName"
+                label="lastName"
+                type="lastName"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                sx={{ width: 300 }}
+                variant="outlined"
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="email"
+                label="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                sx={{ width: 300 }}
+                variant="outlined"
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="password"
+                label="password"
+                type="password"
                 value={password}
-                onClick={handlePasswordClickOpen}
-              >
-                Edit Password
-              </Button>
-              <Dialog open={passwordOpen} onClose={handlePasswordClose}>
-                <DialogTitle>Edit Password</DialogTitle>
-                <DialogContent>
-                  <TextField
-                    autoFocus
-                    margin="dense"
-                    id="password"
-                    label="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    sx={{ width: 300 }}
-                    variant="outlined"
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={handlePasswordClose}>Cancel</Button>
-                  <Button onClick={handlePasswordClose}>Summit</Button>
-                </DialogActions>
-              </Dialog>
-            </Grid>
-          </Grid>
+                onChange={(e) => setPassword(e.target.value)}
+                sx={{ width: 300 }}
+                variant="outlined"
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button onClick={handleClose}>Summit</Button>
+            </DialogActions>
+          </Dialog>
         </div>
       </Paper>
     </>

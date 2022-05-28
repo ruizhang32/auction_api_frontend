@@ -82,7 +82,7 @@ const MyAuctions = () => {
         setErrorFlag(false);
         setErrorMessage("");
         const fetched_auctions = response.data["auctions"];
-        if(!equals(fetched_auctions, auctions)) {
+        if (!equals(fetched_auctions, auctions)) {
           setAuctions(fetched_auctions);
         }
       },
@@ -101,15 +101,15 @@ const MyAuctions = () => {
     });
   };
 
-  // TODO: change the url
   const getBids = () => {
-    axios.get("http://localhost:4941/api/v1/auctions/" + loggedInUserId + "/bids")
+    axios
+      .get("http://localhost:4941/api/v1/auctions/" + loggedInUserId + "/bids")
       .then(
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
           const fetchedBids = response.data;
-          if(!equals(fetchedBids, bids)){
+          if (!equals(fetchedBids, bids)) {
             setBids(fetchedBids);
           }
         },
@@ -188,11 +188,15 @@ const MyAuctions = () => {
                     <TableCell component="th" scope="row">
                       {myAuction.title}
                     </TableCell>
-                    <TableCell align="left">{myAuction.endDate}</TableCell>
+                    <TableCell align="left">
+                      {myAuction.endDate
+                        .replace("T", " ")
+                        .toString()
+                        .substring(0, 11)}
+                    </TableCell>
                     <TableCell align="left">{myAuction.categoryId}</TableCell>
                     <TableCell align="left">
-                      {myAuction.sellerFirstName}
-                      {myAuction.sellerLastName}
+                      {myAuction.sellerFirstName} {myAuction.sellerLastName}
                     </TableCell>
                     <TableCell align="left">{myAuction.highestBid}</TableCell>
                     <TableCell align="left">{myAuction.reserve}</TableCell>

@@ -105,10 +105,10 @@ export default function AppBar() {
             >
               <Avatar
                 hidden={!isLoggedIn}
-                alt="Remy Sharp"
-                // src={
-                //   "http://localhost:4941/api/v1/users/" + { userId } + "/image"
-                // }
+                alt={userName}
+                src={
+                  "http://localhost:4941/api/v1/users/" + { userId } + "/image"
+                }
               />
             </IconButton>
           </Tooltip>
