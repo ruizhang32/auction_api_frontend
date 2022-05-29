@@ -1,4 +1,12 @@
-import { Paper, Table } from "@mui/material";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Paper,
+  Table,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -15,6 +23,8 @@ export default function AnAuction() {
   const { auctionId } = useParams();
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
   const [bidAmount, setBidAmount] = React.useState<string>("");
+  const [numBids, setNumBids] = React.useState<number>(0);
+  const [currentBid, setCurrentBid] = React.useState<string>("");
   const [auction, setAuction] = React.useState<Auction>({
     auctionId: 0,
     title: "",
@@ -31,9 +41,9 @@ export default function AnAuction() {
   });
   const [auctionBidders, setAuctionBidders] = React.useState<Array<Bid>>([]);
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
-  const [isBidSuccessful, setIsBidSuccessful] = React.useState<boolean>(false);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [open, setOpen] = React.useState(false);
   const token = sessionStorage.getItem("token");
   const userId = sessionStorage.getItem("userId");
 
@@ -43,8 +53,14 @@ export default function AnAuction() {
     getCategories();
     getAuctionBidders();
     getSimilarAuctions();
-    console.log("auctionBidders: ", auctionBidders);
-  }, [auctionId]);
+    getCurrentBid();
+    console.log(
+      "auctionBidders: ",
+      auctionBidders,
+      "bidsSortedByTimestamp: ",
+      bidsSortedByTimestamp
+    );
+  }, [auctionId, numBids]);
 
   // return a category list, each element is a dictionary, e.g: {"id":7,"name":"Bicycles"}
   const getCategories = () => {
@@ -89,7 +105,9 @@ export default function AnAuction() {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        setAuction(response.data);
+        const auction: Auction = response.data;
+        setAuction(auction);
+        setNumBids(auction["numBids"]);
       },
       (error) => {
         setErrorFlag(true);
@@ -119,14 +137,8 @@ export default function AnAuction() {
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
-          // if (response.status === 400) {
-          //   //setWarning("Invalid bid amount");
-          // }
-          // else if (response.status === 403) {
-          //   setWarning(response.statusMessage);
-          // }
           setBidAmount("");
-          // setIsBidSuccessful(true);
+          setNumBids(numBids + 1);
           getAuctionBidders();
         },
         (error) => {
@@ -167,21 +179,20 @@ export default function AnAuction() {
     }
   });
 
-  const bidsSortedByBidAmount: Bid[] = auctionBidders.sort((a, b) => {
-    return b["amount"] - a["amount"];
-  });
-
   const getCurrentBid = () => {
     if (bidsSortedByTimestamp.length !== 0) {
       console.log("bidsSortedByTimestamp: ", bidsSortedByTimestamp);
-      return (
+      const currentBid: string =
         bidsSortedByTimestamp[0]["timestamp"].substring(0, 10) +
         " " +
-        bidsSortedByTimestamp[0]["timestamp"].substring(11, 19)
-      );
+        bidsSortedByTimestamp[0]["timestamp"].substring(11, 19);
+      setCurrentBid(currentBid);
     }
-    return "";
   };
+
+  const bidsSortedByBidAmount: Bid[] = auctionBidders.sort((a, b) => {
+    return b["amount"] - a["amount"];
+  });
 
   const getSimilarAuctions = () => {
     return auctions.filter(function (auctionItem) {
@@ -191,6 +202,14 @@ export default function AnAuction() {
         auctionItem.title !== auction.title
       );
     });
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -230,7 +249,7 @@ export default function AnAuction() {
           {/*</Container>*/}
         </Grid>
 
-        <Grid item xs={5}>
+        <Grid item xs={6}>
           {" "}
           <Container sx={{ ml: 6 }}>
             <Typography variant="h6" component="div" gutterBottom>
@@ -279,7 +298,7 @@ export default function AnAuction() {
               Seller:
             </Typography>
             <Grid container spacing={2} sx={{ mb: 3 }}>
-              <Grid item xs={2}>
+              <Grid item xs={5}>
                 <Avatar
                   alt="User Image"
                   src={
@@ -294,31 +313,115 @@ export default function AnAuction() {
                 {auction.sellerFirstName} {auction.sellerLastName}
               </Grid>
             </Grid>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <Typography variant="h5" component="div" gutterBottom>
+                  Reserve:
+                </Typography>
+                <Typography
+                  variant="body1"
+                  component="div"
+                  gutterBottom
+                  sx={{ mb: 3 }}
+                >
+                  {auction.reserve}
+                </Typography>
+              </Grid>
+              <Grid item xs={6}>
+                <div>
+                  <Button variant={"outlined"} onClick={handleClickOpen}>
+                    Similar Auctions
+                  </Button>
 
-            <Typography variant="h5" component="div" gutterBottom>
-              Reserve:
-            </Typography>
-            <Typography
-              variant="body1"
-              component="div"
-              gutterBottom
-              sx={{ mb: 3 }}
-            >
-              {auction.reserve}
-            </Typography>
+                  <Dialog
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="responsive-dialog-title"
+                  >
+                    <DialogTitle id="responsive-dialog-title">
+                      {"Similar Auctions"}
+                    </DialogTitle>
+                    <DialogContent sx={{ width: 400, height: 200 }}>
+                      {getSimilarAuctions().map((similarAuction: Auction) => (
+                        <Grid container spacing={2}>
+                          <Grid item xs={6}>
+                            <Typography
+                              key={similarAuction.auctionId}
+                              variant="body1"
+                              component="div"
+                              gutterBottom
+                            >
+                              {similarAuction.title}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography>
+                              <Link
+                                to={"/auctions/" + similarAuction.auctionId}
+                                onClick={handleClose}
+                              >
+                                Go to Auction
+                              </Link>
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      ))}
+                    </DialogContent>
+                    <DialogActions>
+                      <Button autoFocus onClick={handleClose}>
+                        Close
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </div>
+              </Grid>{" "}
+            </Grid>
           </Container>
         </Grid>
-
-        <Grid item xs={7}>
-          <Paper>
+        <Grid item xs={5}>
+          <Paper sx={{ ml: 6, pt: 0.5, pb: 6 }}>
+            <Container sx={{ ml: 6, mt: 4 }}>
+              <Typography
+                variant="h5"
+                component="div"
+                gutterBottom
+                sx={{ ml: 2 }}
+              >
+                Place a bid
+              </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+                gutterBottom
+                sx={{ ml: 2 }}
+              >
+                Your bid
+              </Typography>
+              <TextField
+                id="outlined-basic"
+                variant="outlined"
+                value={bidAmount}
+                onChange={(e) => setBidAmount(e.target.value)}
+              />
+              <Button
+                variant="contained"
+                size="large"
+                sx={{ ml: 2, mt: 1 }}
+                onClick={postAnBid}
+              >
+                Place bid
+              </Button>
+            </Container>
+          </Paper>
+        </Grid>
+        <Grid item xs={8} sx={{ ml: 8 }}>
+          <Paper sx={{ p: 3 }}>
             <Container sx={{ ml: 2 }}>
               <Typography variant="body1" component="div" gutterBottom>
-                Number of Bids:
-                {auction.numBids}
+                Number of Bids: {numBids}
               </Typography>
               <Typography variant="body1" component="div" gutterBottom>
-                Current Bid:
-                {getCurrentBid()}
+                Current Bid: {currentBid}
               </Typography>
               <Table>
                 <thead>
@@ -341,8 +444,8 @@ export default function AnAuction() {
                   </tr>
                 </thead>
                 <tbody>
-                  {bidsSortedByBidAmount.map((auctionBidder: Bid) => (
-                    <tr key={auctionBidder.bidderId}>
+                  {bidsSortedByBidAmount.map((auctionBidder: Bid, index) => (
+                    <tr key={index}>
                       {/*<th scope="row">{item.user_id}</th>*/}
                       <td align={"left"}>{auctionBidder.amount}</td>
                       <td align={"left"}>{auctionBidder.firstName}</td>
@@ -359,7 +462,7 @@ export default function AnAuction() {
                         />
                       </td>
                       <td align={"left"}>
-                        {auctionBidder.timestamp.substring(0, 10)}
+                        {auctionBidder.timestamp.substring(0, 10)}{" "}
                         {auctionBidder.timestamp.substring(11, 19)}
                       </td>
                     </tr>
@@ -368,62 +471,6 @@ export default function AnAuction() {
               </Table>
             </Container>
           </Paper>
-        </Grid>
-        <Grid item xs={5}>
-          <Container sx={{ ml: 6, mt: 4 }}>
-            <Typography
-              variant="h5"
-              component="div"
-              gutterBottom
-              sx={{ ml: 2 }}
-            >
-              Place a bid
-            </Typography>
-            <Typography
-              variant="h6"
-              component="div"
-              gutterBottom
-              sx={{ ml: 2 }}
-            >
-              Your bid
-            </Typography>
-            <TextField
-              id="outlined-basic"
-              variant="outlined"
-              value={bidAmount}
-              onChange={(e) => setBidAmount(e.target.value)}
-            />
-            <Button
-              variant="contained"
-              size="large"
-              sx={{ ml: 2, mt: 1 }}
-              onClick={postAnBid}
-            >
-              Place bid
-            </Button>
-          </Container>
-        </Grid>
-        <Grid item xs={7}>
-          <Container sx={{ mt: 4 }}>
-            {/*TODO: auction14'link got problem, have to check*/}
-            <Typography variant="h5" component="div" gutterBottom>
-              Similar Auctions
-            </Typography>
-            {getSimilarAuctions().map((similarAuction: Auction) => (
-              <Typography
-                key={similarAuction.auctionId}
-                variant="body1"
-                component="div"
-                gutterBottom
-              >
-                {similarAuction.title}
-                {"  "}
-                <Link to={"/auctions/" + similarAuction.auctionId}>
-                  Go to Auction
-                </Link>
-              </Typography>
-            ))}
-          </Container>
         </Grid>
       </Grid>
     </React.Fragment>
