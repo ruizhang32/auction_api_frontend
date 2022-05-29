@@ -7,6 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import axios from "axios";
+import equals, {calcCategory, getCategoryNamesByIds} from "../Utility/util";
 
 const ITEM_HEIGHT = 20;
 const ITEM_PADDING_TOP = 1;
@@ -34,7 +35,6 @@ export default function MultipleSelectCheckmarks(props: IMultipleSelectProps) {
 
   React.useEffect(() => {
     getCategories();
-    console.log("CategoryName", categoryName);
   }, [categoryName, props.selectedCategoryIdList]);
 
   const getCategories = () => {
@@ -43,6 +43,10 @@ export default function MultipleSelectCheckmarks(props: IMultipleSelectProps) {
         setErrorFlag(false);
         setErrorMessage("");
         setAllCategoryList(response.data);
+        const myCategoryName = getCategoryNamesByIds(props.selectedCategoryIdList, allCategoryList);
+        if(!equals(myCategoryName, categoryName)){
+          setCategoryName(myCategoryName);
+        }
       },
       (error) => {
         setErrorFlag(true);
@@ -55,7 +59,6 @@ export default function MultipleSelectCheckmarks(props: IMultipleSelectProps) {
     const {
       target: { value },
     } = event;
-    console.log("value", value);
     let myValue: string[] = [];
     if (typeof value === "string") {
       myValue = [value];

@@ -12,7 +12,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import isAFutureDate from "../Validation/InputValidation";
 import MultipleSelectChip from "../templates/MultipleSelect";
-import equals, { defaultImageUrl } from "../Utility/util";
+import equals, {calcCategories, defaultImageUrl} from "../Utility/util";
 
 export default function AuctionForm() {
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
@@ -239,12 +239,13 @@ export default function AuctionForm() {
     }
 
     console.log(auction.categoryId);
-    const myCategory = categoryList.find(
-      (x) => x.categoryId === auction.categoryId
-    );
-    if (myCategory !== undefined) {
-      setAuctionCategory(myCategory.name);
+    const myCategoryLists = calcCategories(auction.categoryId);
+    if(!equals(myCategoryLists, selectedCategoryIdList)){
+      setSelectedCategoryIdList(myCategoryLists);
     }
+
+
+
     if (!equals(new Date(auction.endDate), date)) {
       setDate(new Date(auction.endDate));
     }
