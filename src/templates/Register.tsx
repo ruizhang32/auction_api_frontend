@@ -23,7 +23,6 @@ import {
   OutlinedInput,
   Paper,
 } from "@mui/material";
-import UploadImage from "./UploadImage";
 import { defaultImageUrl } from "../Utility/util";
 
 interface State {
@@ -197,6 +196,23 @@ export default function Register() {
     event.preventDefault();
   };
 
+  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files !== null) {
+      const uploadFile = e.target.files[0];
+      setImage(URL.createObjectURL(uploadFile));
+      setUploadFile(uploadFile);
+      const fileSplits = uploadFile.name.split(".");
+      if (fileSplits !== undefined) {
+        const uploadFileExt = fileSplits.pop();
+        console.log(fileSplits);
+        console.log(uploadFileExt);
+        if (uploadFileExt !== undefined) {
+          setFileExt(uploadFileExt);
+        }
+      }
+    }
+  };
+
   if (isSignedIn) {
     return <Navigate to={"/Auctions"}></Navigate>;
   } else {
@@ -221,20 +237,49 @@ export default function Register() {
                 Sign up
               </Typography>
               <Box sx={{ mt: 3 }}>
-                <UploadImage
-                  image={image}
-                  setImage={setImage}
-                  uploadFile={uploadFile}
-                  setUploadFile={setUploadFile}
-                  fileExt={fileExt}
-                  setFileExt={setFileExt}
-                  getImageURL={getImageURL}
-                  errorFlag={errorFlag}
-                  setErrorFlag={setErrorFlag}
-                  errorMessage={errorMessage}
-                  setErrorMessage={setErrorMessage}
-                  id={id}
-                ></UploadImage>
+                <div>
+                  <Box
+                    sx={{
+                      width: 800,
+                      height: 450,
+                      backgroundColor: "grey",
+                      mb: 3,
+                    }}
+                  >
+                    {" "}
+                    {image && (
+                      <img
+                        alt="auction image"
+                        src={image}
+                        style={{
+                          maxWidth: 800,
+                          maxHeight: 450,
+                        }}
+                      ></img>
+                    )}
+                  </Box>
+                  <Box>
+                    <label htmlFor="contained-button-file">
+                      <input
+                        style={{
+                          display: "none",
+                        }}
+                        accept="image/*"
+                        id="contained-button-file"
+                        multiple
+                        type="file"
+                        onChange={onImageChange}
+                      />
+                      <Button variant="outlined" component="span">
+                        Upload
+                      </Button>
+                    </label>
+
+                    <Button variant="outlined" component="span">
+                      Delete
+                    </Button>
+                  </Box>
+                </div>
               </Box>
               {/*<Box>*/}
               {/*  <label htmlFor="contained-button-file">*/}

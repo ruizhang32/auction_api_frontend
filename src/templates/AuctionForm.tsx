@@ -8,7 +8,6 @@ import Button from "@mui/material/Button";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import MultipleSelectChip from "../templates/MultipleSelect";
 import equals, { calcCategories, defaultImageUrl } from "../Utility/util";
@@ -258,24 +257,6 @@ export default function AuctionForm() {
       }
     );
   };
-
-  // const getCategoryNames = () => {
-  //   let nameList: string[] = [];
-  //   for (let i = 0; i < categoryList.length; i++) {
-  //     nameList.push(categoryList[i]["name"]);
-  //   }
-  //   return nameList;
-  // };
-  //
-  // const handleCategories = (event: SelectChangeEvent<typeof categoryNames>) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-  //   setCategoryNames(
-  //     // On auto fill we get a string type value.
-  //     typeof value === "string" ? value.split(",") : value
-  //   );
-  // };
 
   const handleDate = (newDateValue: Date | null) => {
     if (newDateValue !== null) {

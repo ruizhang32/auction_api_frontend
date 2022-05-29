@@ -15,7 +15,6 @@ import {
 import Button from "@mui/material/Button";
 import axios from "axios";
 import equals, { defaultImageUrl } from "../Utility/util";
-import UploadImage from "./UploadImage";
 
 export default function UserForm() {
   let file = new File([new Blob()], "default image");
