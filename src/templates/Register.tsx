@@ -213,6 +213,12 @@ export default function Register() {
     }
   };
 
+  const handleDeleteImage = () => {
+    setImage(defaultImageUrl);
+    setUploadFile(newFile);
+    setFileExt("");
+  };
+
   if (isSignedIn) {
     return <Navigate to={"/Auctions"}></Navigate>;
   } else {
@@ -259,25 +265,34 @@ export default function Register() {
                     )}
                   </Box>
                   <Box>
-                    <label htmlFor="contained-button-file">
-                      <input
-                        style={{
-                          display: "none",
-                        }}
-                        accept="image/*"
-                        id="contained-button-file"
-                        multiple
-                        type="file"
-                        onChange={onImageChange}
-                      />
-                      <Button variant="outlined" component="span">
-                        Upload
-                      </Button>
-                    </label>
-
-                    <Button variant="outlined" component="span">
-                      Delete
-                    </Button>
+                    <Grid container spacing={2}>
+                      <Grid item xs={2}>
+                        <label htmlFor="contained-button-file">
+                          <input
+                            style={{
+                              display: "none",
+                            }}
+                            accept="image/*"
+                            id="contained-button-file"
+                            multiple
+                            type="file"
+                            onChange={onImageChange}
+                          />
+                          <Button variant="outlined" component="span">
+                            Upload Image
+                          </Button>
+                        </label>
+                      </Grid>
+                      <Grid item xs={2}>
+                        <Button
+                          variant="outlined"
+                          component="span"
+                          onClick={handleDeleteImage}
+                        >
+                          Delete Image
+                        </Button>
+                      </Grid>
+                    </Grid>
                   </Box>
                 </div>
               </Box>
