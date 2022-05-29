@@ -1,4 +1,5 @@
 import Avatar from "@mui/material/Avatar";
+import Grid from "@mui/material/Grid";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
 import React from "react";
@@ -72,20 +73,35 @@ export default function AppBar() {
         </Typography>
 
         <nav>
-          <Link to="/" style={{ textDecoration: "none", fontSize: 26 }}>
+          <Link
+            to="/"
+            style={{
+              textDecoration: "none",
+              fontSize: 26,
+              marginRight: 15,
+            }}
+          >
             HOME
           </Link>{" "}
           <Link
             to="/login"
             hidden={isLoggedIn}
-            style={{ textDecoration: "none", fontSize: 20 }}
+            style={{
+              textDecoration: "none",
+              fontSize: 20,
+              marginRight: 15,
+            }}
           >
             Login
           </Link>{" "}
           <Link
             to="/Auctions"
             hidden={!isLoggedIn}
-            style={{ textDecoration: "none", fontSize: 20 }}
+            style={{
+              textDecoration: "none",
+              fontSize: 20,
+              marginRight: 15,
+            }}
             onClick={handleLogOut}
           >
             Log out
@@ -93,7 +109,11 @@ export default function AppBar() {
           <Link
             to="/register"
             hidden={isLoggedIn}
-            style={{ textDecoration: "none", fontSize: 20 }}
+            style={{
+              textDecoration: "none",
+              fontSize: 20,
+              marginRight: 15,
+            }}
           >
             Register
           </Link>{" "}
