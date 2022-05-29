@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertTitle,
   Dialog,
   DialogActions,
   DialogContent,
@@ -406,11 +408,17 @@ export default function AnAuction() {
               <Button
                 variant="contained"
                 size="large"
-                sx={{ ml: 2, mt: 1 }}
+                sx={{ ml: 2, mt: 1, mb: 3 }}
                 onClick={postAnBid}
               >
                 Place bid
               </Button>
+              <div hidden={!errorFlag}>
+                <Alert severity="error" sx={{ width: 300, mt: 1 }}>
+                  <AlertTitle>Error</AlertTitle>
+                  <strong>{errorMessage}</strong>
+                </Alert>
+              </div>
             </Container>
           </Paper>
         </Grid>
