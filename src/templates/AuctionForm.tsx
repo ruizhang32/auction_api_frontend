@@ -74,28 +74,6 @@ export default function AuctionForm() {
       getAnAuction();
       setMyAuction(auction);
     }
-    console.log(
-      "selectedCategoryIdList: ",
-      selectedCategoryIdList,
-      "title:",
-      auctionTitle,
-      "categoryId:",
-      categoryId,
-      "reserve:",
-      reservePrice,
-      "endDate:",
-      // date.toISOString().replace("T", " ").substring(0, 19),
-      "description:",
-      description,
-      "sellerId:",
-      sellerId,
-      "auctionCategory:",
-      auctionCategory,
-      "image: ",
-      auctionImage,
-      "auctionId",
-      auctionId
-    );
   }, [
     auctionId,
     auctionCategory,
@@ -184,7 +162,6 @@ export default function AuctionForm() {
               fileEContentType = "image/gif"
             }
             const addImageUrl = `{http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
-            console.log(addImageUrl);
             const imageConfig = {
               headers: { "X-Authorization": `${token}`,  "Content-Type": `${fileEContentType}`},
             };
@@ -291,6 +268,8 @@ export default function AuctionForm() {
     if(!equals(auction.title, auctionTitle)){
       setAuctionTitle(auction.title);
     }
+
+    console.log(auction.categoryId)
     // const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
     // if(myCategory !== undefined){
     //   setAuctionCategory(myCategory.name);
@@ -342,11 +321,9 @@ export default function AuctionForm() {
         setErrorFlag(false);
         setErrorMessage("");
         const categoryObjects : Array<Category> = response.data;
-        console.log(categoryObjects)
         if(!equals(categoryObjects, categoryList)){
           setCategoryList(categoryObjects);
         }
-        console.log(categoryList)
       },
       (error) => {
         setErrorFlag(true);
@@ -413,7 +390,6 @@ export default function AuctionForm() {
       const uploadFile = e.target.files[0];
       setAuctionImage(URL.createObjectURL(uploadFile));
       setUploadFile(uploadFile);
-      console.log(uploadFile);
       const fileSplits = uploadFile.name.split('.');
       if(fileSplits !== undefined){
         const uploadFileExt = fileSplits.pop();
