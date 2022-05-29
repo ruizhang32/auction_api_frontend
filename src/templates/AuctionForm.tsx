@@ -10,7 +10,13 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import MultipleSelectChip from "../templates/MultipleSelect";
-import equals, { calcCategories, defaultImageUrl } from "../Utility/util";
+import equals, {
+  calcCategories,
+  calcCategory,
+  defaultImageUrl,
+  formatDate,
+  getCategoryIdsByNames
+} from "../Utility/util";
 
 export default function AuctionForm() {
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
@@ -39,7 +45,7 @@ export default function AuctionForm() {
     React.useState<boolean>(true);
   const [auctionIsUpdated, setAuctionIsUpdated] =
     React.useState<boolean>(false);
-  const [imageIsUpdated, setImageIsUpdated] = React.useState<boolean>(false);
+  let imageIsUpdated = false;
   const [imageIsUploaded, setImageIsUploaded] = React.useState<boolean>(false);
   const [auction, setAuction] = React.useState<Auction>({
     auctionId: 0,
@@ -79,11 +85,45 @@ export default function AuctionForm() {
     }
   }, [auction]);
 
+  function uploadImage(myAuctionId : number) {
+    if(!imageIsUploaded){
+      return;
+    }
+    imageIsUpdated = false;
+    let fileContentType = "";
+    const lowerFileExt = fileExt.toLowerCase();
+    if (lowerFileExt === "png") {
+      fileContentType = "image/png";
+    } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+      fileContentType = "image/jpeg";
+    } else if (lowerFileExt === "gif") {
+      fileContentType = "image/gif";
+    }
+    if (fileContentType !== "") {
+      const addImageUrl = `http://localhost:4941/api/v1/auctions/${myAuctionId}/image`;
+      const imageConfig = {
+        headers: {
+          "X-Authorization": `${token}`,
+          "Content-Type": `${fileContentType}`,
+        },
+      };
+      axios.put(addImageUrl, uploadFile, imageConfig).then(
+          (response) => {
+            if (response.status === 201 || response.status === 200) {
+              // auctionIsUpdated === true if auction is created or updated
+              imageIsUpdated = true;
+            }
+          },
+          (error) => {
+            throw error;
+          }
+      );
+    }
+    setImageIsUploaded(false);
+  }
+
   const postAnAuction = () => {
-    const dbFormatDate: string = date
-      .toISOString()
-      .replace("T", " ")
-      .substring(0, 19);
+    const dbFormatDate: string = formatDate(date);
 
     let bodyParameters = {
       title: auctionTitle,
@@ -98,42 +138,10 @@ export default function AuctionForm() {
     axios.post(addAuctionFormUrl, bodyParameters, config).then(
       (response) => {
         if (response.status === 201 || response.status === 200) {
-          setImageIsUpdated(false);
-          let fileContentType = "";
-          const lowerFileExt = fileExt.toLowerCase();
-          if (lowerFileExt === "png") {
-            fileContentType = "image/png";
-          } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
-            fileContentType = "image/jpeg";
-          } else if (lowerFileExt === "gif") {
-            fileContentType = "image/gif";
-          }
-          if (fileContentType !== "") {
-            const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
-            const imageConfig = {
-              headers: {
-                "X-Authorization": `${token}`,
-                "Content-Type": `${fileContentType}`,
-              },
-            };
-            axios.put(addImageUrl, uploadFile, imageConfig).then(
-              (res) => {
-                if (response.status === 201 || response.status === 200) {
-                  setErrorFlag(false);
-                  setErrorMessage("");
-                  // auctionIsUpdated === true if auction is created or updated
-                  setAuctionIsUpdated(true);
-                  setImageIsUpdated(true);
-                }
-              },
-              (err) => {
-                throw err;
-              }
-            );
-          }
-          if (!auctionIsUpdated) {
-            throw new Error("Image not updated");
-          }
+          // auctionIsUpdated === true if auction is created or updated
+          setAuctionIsUpdated(true);
+          const myAuctionId = response.data.auctionId;
+          uploadImage(myAuctionId);
         }
       },
       (error) => {
@@ -144,14 +152,11 @@ export default function AuctionForm() {
   };
 
   const putAnAuction = () => {
-    const dbFormatDate: string = date
-      .toISOString()
-      .replace("T", " ")
-      .substring(0, 19);
+    const dbFormatDate: string = formatDate(date);
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: categoryId,
+      categoryId: calcCategory(selectedCategoryIdList),
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
@@ -159,17 +164,20 @@ export default function AuctionForm() {
     };
 
     axios
-      .put(
-        "http://localhost:4941/api/v1/auctions/" + auctionId + "/image",
+      .patch(
+        "http://localhost:4941/api/v1/auctions/" + auctionId,
         bodyParameters,
         config
       )
       .then(
         (response) => {
-          setAuction(response.data);
+          // setAuction(response.data);
           if (response.status === 200) {
             // auctionIsUpdated === true if auction is created or updated
             setAuctionIsUpdated(true);
+            if(auctionId !== undefined){
+              uploadImage(parseInt(auctionId));
+            }
           }
         },
         (error) => {

@@ -7,7 +7,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Checkbox from "@mui/material/Checkbox";
 import axios from "axios";
-import equals, {calcCategory, getCategoryNamesByIds} from "../Utility/util";
+import equals, {calcCategory, getCategoryIdsByNames, getCategoryNamesByIds} from "../Utility/util";
 
 const ITEM_HEIGHT = 20;
 const ITEM_PADDING_TOP = 1;
@@ -66,21 +66,7 @@ export default function MultipleSelectCheckmarks(props: IMultipleSelectProps) {
       myValue = value;
     }
     setCategoryName(myValue);
-    props.setSelectedCategoryIdList(mapCategoryNameWithId(myValue));
-  };
-
-  let idList: number[] = [];
-  const mapCategoryNameWithId = (value: string[]) => {
-    for (let i = 0; i < value.length; i++) {
-      const found = allCategoryList.find(
-        (element) => element["name"] === value[i]
-      );
-
-      if (found !== undefined) {
-        idList.push(found["categoryId"]);
-      }
-    }
-    return idList;
+    props.setSelectedCategoryIdList(getCategoryIdsByNames(myValue, allCategoryList));
   };
 
   const getCategoryNames = () => {
