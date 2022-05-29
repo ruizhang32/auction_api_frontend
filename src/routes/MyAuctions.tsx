@@ -26,6 +26,9 @@ import equals from "../Utility/util";
 const MyAuctions = () => {
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
   const [auctionsIBid, setAuctionsIBid] = React.useState<Array<Auction>>([]);
+  const [idOfAuctionsWithBids, setIdOfAuctionsWithBids] = React.useState<
+    Array<number>
+  >([]);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -75,7 +78,6 @@ const MyAuctions = () => {
   React.useEffect(() => {
     getAuctions();
     getMyBids();
-    console.log("bids: ", auctionsIBid, "loggedInUserId: ", loggedInUserId);
   }, [auctions, auctionsIBid]);
 
   const getAuctions = () => {
@@ -86,6 +88,18 @@ const MyAuctions = () => {
         const fetched_auctions = response.data["auctions"];
         if (!equals(fetched_auctions, auctions)) {
           setAuctions(fetched_auctions);
+          const auctionsWithBidsArray = fetched_auctions.filter(function (
+            auction: Auction
+          ) {
+            return auction.highestBid !== null;
+          });
+          const idOfAuctionsWithBids = auctionsWithBidsArray.map(
+            (auction: Auction) => {
+              return auction.auctionId;
+            }
+          );
+          console.log("idOfAuctionsWithBids: ", idOfAuctionsWithBids);
+          setIdOfAuctionsWithBids(idOfAuctionsWithBids);
         }
       },
       (error) => {
@@ -122,12 +136,6 @@ const MyAuctions = () => {
         }
       );
   };
-
-  // const getMyBids = () => {
-  //   return bids.filter(function (bidItems) {
-  //     return bidItems.sellerId === parseInt(loggedInUserId as string);
-  //   });
-  // };
 
   const deleteAuction = (auction: Auction) => {
     axios
@@ -200,7 +208,15 @@ const MyAuctions = () => {
                     <TableCell align="left">{myAuction.highestBid}</TableCell>
                     <TableCell align="left">{myAuction.reserve}</TableCell>
                     <TableCell align="left">
+                      {/*<div*/}
+                      {/*  hidden={idOfAuctionsWithBids.includes(*/}
+                      {/*    myAuction.auctionId*/}
+                      {/*  )}*/}
+                      {/*>*/}
                       <Button
+                        disabled={idOfAuctionsWithBids.includes(
+                          myAuction.auctionId
+                        )}
                         variant="outlined"
                         onClick={() => {
                           goToEditAuctionPage(myAuction);
@@ -208,9 +224,18 @@ const MyAuctions = () => {
                       >
                         Edit
                       </Button>
+                      {/*</div>*/}
                     </TableCell>
                     <TableCell align="left">
+                      {/*<div*/}
+                      {/*  hidden={idOfAuctionsWithBids.includes(*/}
+                      {/*    myAuction.auctionId*/}
+                      {/*  )}*/}
+                      {/*>*/}
                       <Button
+                        disabled={idOfAuctionsWithBids.includes(
+                          myAuction.auctionId
+                        )}
                         variant="outlined"
                         endIcon={<DeleteIcon />}
                         onClick={() => {
@@ -218,7 +243,8 @@ const MyAuctions = () => {
                         }}
                       >
                         Delete
-                      </Button>{" "}
+                      </Button>
+                      {/*</div>*/}
                       <Dialog
                         open={openDeleteDialog}
                         onClose={handleDeleteDialogClose}

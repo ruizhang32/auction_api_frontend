@@ -12,7 +12,7 @@ import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
 import isAFutureDate from "../Validation/InputValidation";
 import MultipleSelectChip from "../templates/MultipleSelect";
-import equals, {defaultImageUrl} from "../Utility/util";
+import equals, { defaultImageUrl } from "../Utility/util";
 
 export default function AuctionForm() {
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
@@ -21,7 +21,8 @@ export default function AuctionForm() {
   const [description, setDescription] = React.useState<string>("");
   const [reservePrice, setReservePrice] = React.useState<string>("");
   const [auctionCategory, setAuctionCategory] = React.useState<string>("");
-  const [auctionImage, setAuctionImage] = React.useState<string>(defaultImageUrl);
+  const [auctionImage, setAuctionImage] =
+    React.useState<string>(defaultImageUrl);
   const [categoryId, setCategoryId] = React.useState<string>();
   const [selectedCategoryIdList, setSelectedCategoryIdList] = React.useState<
     Array<string>
@@ -70,23 +71,12 @@ export default function AuctionForm() {
   React.useEffect(() => {
     getCategories();
     // getCategoryIdByName();
-    if(auctionId !== undefined && parseInt(auctionId) > 0){
+    if (auctionId !== undefined && parseInt(auctionId) > 0) {
       getAnAuction();
       getImage();
       setMyAuction(auction);
     }
-  }, [
-    // auctionId,
-    // auctionCategory,
-    // auctionTitle,
-    // auctionImage,
-    // reservePrice,
-    // description,
-    // date,
-    // categoryId,
-    // categoryNames,
-      auction
-  ]);
+  }, [auction]);
 
   const postAnAuction = () => {
     const dbFormatDate: string = date
@@ -103,91 +93,46 @@ export default function AuctionForm() {
       sellerId: sellerId,
     };
 
-    // check if any input is not validated
-    // if not validated, show the hidden alert to user
-
-    // // Title must not be empty
-    // if (auctionTitle !== "") {
-    //   bodyParameters["title"] = auctionTitle;
-    // } else {
-    //   setIsTitleValidate(true);
-    // }
-    //
-    // // Category is one or more of the existing categories
-    // if (selectedCategoryIdList.length === 0) {
-    //   setIsCategoryValidate(true);
-    // } else {
-    //   for (let categoryId in selectedCategoryIdList) {
-    //     if (parseInt(categoryId) !== 0 && categoryId !== undefined) {
-    //       bodyParameters["categoryId"] = categoryId;
-    //     }
-    //   }
-    // }
-    //
-    // // Reserve price (this must be $1 or more)
-    // if (reservePrice !== "" && parseInt(reservePrice) < 1) {
-    //   bodyParameters["reserve"] = reservePrice;
-    // } else {
-    //   setIsReservePriceValidate(true);
-    // }
-    //
-    // // End date must be in the future
-    // if (dbFormatDate !== "" && isAFutureDate(dbFormatDate)) {
-    //   bodyParameters["endDate"] = dbFormatDate;
-    // } else {
-    //   setIsEndDateValidate(true);
-    // }
-    //
-    // // Description must not be empty
-    // if (description !== "") {
-    //   bodyParameters["description"] = description;
-    // } else {
-    //   setIsDescriptionValidate(true);
-    // }
-    //
-    // if (reservePrice !== "") {
-    //   bodyParameters["reserve"] = reservePrice;
-    // }
-
     const addAuctionFormUrl = "http://localhost:4941/api/v1/auctions/";
-    axios
-      .post(addAuctionFormUrl, bodyParameters, config)
-      .then(
-        (response) => {
-          if (response.status === 201 || response.status === 200) {
-            let fileContentType = "";
-            const lowerFileExt = fileExt.toLowerCase();
-            if(lowerFileExt === "png"){
-              fileContentType = "image/png"
-            }else if(lowerFileExt === "jpeg" || lowerFileExt === "jpg"){
-              fileContentType = "image/jpeg"
-            }else if(lowerFileExt === "gif"){
-              fileContentType = "image/gif"
-            }
-            const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
-            const imageConfig = {
-              headers: { "X-Authorization": `${token}`,  "Content-Type": `${fileContentType}`},
-            };
-            axios
-                .put(addImageUrl, uploadFile, imageConfig)
-                .then((res) => {
-                  if (response.status === 201 || response.status === 200){
-                    setErrorFlag(false);
-                    setErrorMessage("");
-                    // auctionIsUpdated === true if auction is created or updated
-                    setAuctionIsUpdated(true);
-                  }
-                }, (err) => {
-                  throw err;
-                })
+    axios.post(addAuctionFormUrl, bodyParameters, config).then(
+      (response) => {
+        if (response.status === 201 || response.status === 200) {
+          let fileContentType = "";
+          const lowerFileExt = fileExt.toLowerCase();
+          if (lowerFileExt === "png") {
+            fileContentType = "image/png";
+          } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+            fileContentType = "image/jpeg";
+          } else if (lowerFileExt === "gif") {
+            fileContentType = "image/gif";
           }
-        },
-        (error) => {
-          setErrorFlag(true);
-          setErrorMessage(error.response.statusText);
+          const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
+          const imageConfig = {
+            headers: {
+              "X-Authorization": `${token}`,
+              "Content-Type": `${fileContentType}`,
+            },
+          };
+          axios.put(addImageUrl, uploadFile, imageConfig).then(
+            (res) => {
+              if (response.status === 201 || response.status === 200) {
+                setErrorFlag(false);
+                setErrorMessage("");
+                // auctionIsUpdated === true if auction is created or updated
+                setAuctionIsUpdated(true);
+              }
+            },
+            (err) => {
+              throw err;
+            }
+          );
         }
-      );
-
+      },
+      (error) => {
+        setErrorFlag(true);
+        setErrorMessage(error.response.statusText);
+      }
+    );
   };
 
   const putAnAuction = () => {
@@ -252,30 +197,32 @@ export default function AuctionForm() {
 
   const getAnAuction = () => {
     axios.get("http://localhost:4941/api/v1/auctions/" + auctionId).then(
-        (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
-          const myAction : Auction = response.data;
-          if(!equals(myAction, auction)){
-            setAuction(myAction);
-          }
-        },
-        (error) => {
-          setErrorFlag(true);
-          setErrorMessage(error.response.statusText);
+      (response) => {
+        setErrorFlag(false);
+        setErrorMessage("");
+        const myAction: Auction = response.data;
+        if (!equals(myAction, auction)) {
+          setAuction(myAction);
         }
+      },
+      (error) => {
+        setErrorFlag(true);
+        setErrorMessage(error.response.statusText);
+      }
     );
   };
 
   const getImage = () => {
-    axios.get(`http://localhost:4941/api/v1/auctions/${auctionId}/image`, {
-      responseType: 'blob'
-    }).then(
+    axios
+      .get(`http://localhost:4941/api/v1/auctions/${auctionId}/image`, {
+        responseType: "blob",
+      })
+      .then(
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
           const photoUrl = URL.createObjectURL(response.data);
-          if(!equals(photoUrl, auctionImage)){
+          if (!equals(photoUrl, auctionImage)) {
             setAuctionImage(photoUrl);
           }
         },
@@ -283,29 +230,31 @@ export default function AuctionForm() {
           setErrorFlag(true);
           setErrorMessage(error.response.statusText);
         }
-    )
+      );
   };
 
-  const setMyAuction = (auction: Auction) =>{
-    if(!equals(auction.title, auctionTitle)){
+  const setMyAuction = (auction: Auction) => {
+    if (!equals(auction.title, auctionTitle)) {
       setAuctionTitle(auction.title);
     }
 
-    console.log(auction.categoryId)
-    const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
-    if(myCategory !== undefined){
+    console.log(auction.categoryId);
+    const myCategory = categoryList.find(
+      (x) => x.categoryId === auction.categoryId
+    );
+    if (myCategory !== undefined) {
       setAuctionCategory(myCategory.name);
     }
-    if(!equals(new Date(auction.endDate), date)){
+    if (!equals(new Date(auction.endDate), date)) {
       setDate(new Date(auction.endDate));
     }
-    if(!equals(auction.description, description)){
+    if (!equals(auction.description, description)) {
       setDescription(auction.description);
     }
-    if(!equals(auction.reserve.toString(), reservePrice)){
+    if (!equals(auction.reserve.toString(), reservePrice)) {
       setReservePrice(auction.reserve.toString());
     }
-  }
+  };
 
   // const searchId = (value: string, myArray: Array<Category>) => {
   //   for (let i = 0; i < myArray.length; i++) {
@@ -342,8 +291,8 @@ export default function AuctionForm() {
       (response) => {
         setErrorFlag(false);
         setErrorMessage("");
-        const categoryObjects : Array<Category> = response.data;
-        if(!equals(categoryObjects, categoryList)){
+        const categoryObjects: Array<Category> = response.data;
+        if (!equals(categoryObjects, categoryList)) {
           setCategoryList(categoryObjects);
         }
       },
@@ -412,12 +361,12 @@ export default function AuctionForm() {
       const uploadFile = e.target.files[0];
       setAuctionImage(URL.createObjectURL(uploadFile));
       setUploadFile(uploadFile);
-      const fileSplits = uploadFile.name.split('.');
-      if(fileSplits !== undefined){
+      const fileSplits = uploadFile.name.split(".");
+      if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
-        console.log(fileSplits)
-        console.log(uploadFileExt)
-        if(uploadFileExt !== undefined){
+        console.log(fileSplits);
+        console.log(uploadFileExt);
+        if (uploadFileExt !== undefined) {
           setFileExt(uploadFileExt);
         }
       }
@@ -569,15 +518,18 @@ export default function AuctionForm() {
                 backgroundColor: "grey",
                 mb: 3,
               }}
-            >   { auctionImage && <img
-                alt="auction image"
-                src={auctionImage}
-                style={{
-                  maxWidth: 800,
-                  maxHeight: 450,
-                }}
-            ></img>}
-
+            >
+              {" "}
+              {auctionImage && (
+                <img
+                  alt="auction image"
+                  src={auctionImage}
+                  style={{
+                    maxWidth: 800,
+                    maxHeight: 450,
+                  }}
+                ></img>
+              )}
             </Box>
             <Box>
               <label htmlFor="contained-button-file">
