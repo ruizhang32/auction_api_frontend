@@ -44,9 +44,11 @@ const MyAuctions = () => {
     description: "",
     image_filename: "",
   });
-
   const loggedInUserId: string | null = sessionStorage.getItem("userId");
   const loggedInUserToken: string | null = sessionStorage.getItem("token");
+  const config = {
+    headers: { "X-Authorization": `${loggedInUserToken}` },
+  };
 
   const handleDeleteDialogOpen = (auction: Auction) => {
     setDialogAuction(auction);
@@ -127,9 +129,6 @@ const MyAuctions = () => {
   };
 
   const deleteAuction = (auction: Auction) => {
-    const config = {
-      headers: { "X-Authorization": `${loggedInUserToken}` },
-    };
     axios
       .delete(
         "http://localhost:4941/api/v1/auctions/" + auction.auctionId,

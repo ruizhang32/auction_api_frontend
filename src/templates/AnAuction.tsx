@@ -48,6 +48,9 @@ export default function AnAuction() {
   const [open, setOpen] = React.useState(false);
   const token = sessionStorage.getItem("token");
   const userId = sessionStorage.getItem("userId");
+  const config = {
+    headers: { "X-Authorization": `${token}` },
+  };
 
   React.useEffect(() => {
     getAuctions();
@@ -119,10 +122,6 @@ export default function AnAuction() {
   };
 
   const postAnBid = () => {
-    const config = {
-      headers: { "X-Authorization": `${token}` },
-    };
-
     const bodyParameter = {
       amount: 0,
     };

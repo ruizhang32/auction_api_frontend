@@ -57,6 +57,10 @@ export default function AuctionForm() {
   });
   const sellerId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+  const config = {
+    headers: { "X-Authorization": `${token}` },
+  };
+
   const { auctionId } = useParams();
   const isNewAuction: boolean = auctionId === undefined;
 
@@ -106,10 +110,6 @@ export default function AuctionForm() {
       .toISOString()
       .replace("T", " ")
       .substring(0, 19);
-
-    const config = {
-      headers: { "X-Authorization": `${token}` },
-    };
 
     let bodyParameters = {
       title: "",
@@ -190,10 +190,6 @@ export default function AuctionForm() {
       .toISOString()
       .replace("T", " ")
       .substring(0, 19);
-
-    const config = {
-      headers: { "X-Authorization": `${token}` },
-    };
 
     const bodyParameters = {
       title: "",
