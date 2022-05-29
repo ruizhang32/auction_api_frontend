@@ -1,3 +1,4 @@
+import { Alert, AlertTitle, Paper } from "@mui/material";
 import axios from "axios";
 import * as React from "react";
 import Avatar from "@mui/material/Avatar";
@@ -34,7 +35,9 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function SignIn() {
-  const [isSignedIn, setIsSignedIn] = React.useState(false);
+  const [isSignedIn, setIsSignedIn] = React.useState(
+    sessionStorage.getItem("token") !== null
+  );
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -83,58 +86,65 @@ export default function SignIn() {
               alignItems: "center",
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-              <LockOutlinedIcon />
-            </Avatar>
-            <Typography component="h1" variant="h5">
-              Sign in
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              noValidate
-              sx={{ mt: 1 }}
-            >
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                autoFocus
-                // value={email}
-                // onChange={(e) => setEmail(e.target.value)}
-              />
-              <TextField
-                margin="normal"
-                required
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-                // value={password}
-                // onChange={(e) => setPassword(e.target.value)}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2 }}
+            <Paper sx={{ p: 5, width: 500 }}>
+              <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                Sign in
+              </Typography>
+              <Box
+                component="form"
+                onSubmit={handleSubmit}
+                noValidate
+                sx={{ mt: 1 }}
               >
-                Sign In
-              </Button>
-              <Grid container>
-                <Grid item>
-                  <Link href="http://localhost:3000/register" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  id="email"
+                  label="Email Address"
+                  name="email"
+                  autoComplete="email"
+                  autoFocus
+                />
+                <TextField
+                  margin="normal"
+                  required
+                  fullWidth
+                  name="password"
+                  label="Password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                  // value={password}
+                  // onChange={(e) => setPassword(e.target.value)}
+                />
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
+                  sx={{ mt: 3, mb: 2 }}
+                >
+                  Sign In
+                </Button>
+
+                <Grid container>
+                  <Grid item>
+                    <Link href="http://localhost:3000/register" variant="body2">
+                      {"Don't have an account? Sign Up"}
+                    </Link>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Box>
+                <div hidden={!errorFlag}>
+                  <Alert severity="error" sx={{ width: 400, mt: 1 }}>
+                    <AlertTitle>Error</AlertTitle>
+                    <strong>{errorMessage}</strong>
+                  </Alert>
+                </div>
+              </Box>
+            </Paper>
           </Box>
           <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
