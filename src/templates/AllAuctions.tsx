@@ -126,7 +126,6 @@ const AllAuctions = (props: IAuctionsProps) => {
     }
 
     URL += query;
-    console.log(URL);
     axios.get(URL).then(
       (response) => {
         setErrorFlag(false);

@@ -3,14 +3,13 @@ import { Navigate, useParams } from "react-router-dom";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import { Alert, OutlinedInput, Select } from "@mui/material";
+import { Alert } from "@mui/material";
 import Button from "@mui/material/Button";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
-import isAFutureDate from "../Validation/InputValidation";
 import MultipleSelectChip from "../templates/MultipleSelect";
 import equals, {calcCategories, defaultImageUrl} from "../Utility/util";
 
@@ -73,7 +72,7 @@ export default function AuctionForm() {
     // getCategoryIdByName();
     if (auctionId !== undefined && parseInt(auctionId) > 0) {
       getAnAuction();
-      getImage();
+      //getImage();
       setMyAuction(auction);
     }
   }, [auction]);

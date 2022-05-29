@@ -7,8 +7,6 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
@@ -25,6 +23,8 @@ import {
   OutlinedInput,
   Paper,
 } from "@mui/material";
+import UploadImage from "./UploadImage";
+import { defaultImageUrl } from "../Utility/util";
 
 interface State {
   amount: string;
@@ -55,9 +55,10 @@ function Copyright(props: any) {
 const theme = createTheme();
 
 export default function Register() {
-  const [isSignedUp, setIsSignedUp] = React.useState(false);
-  const [errorFlag, setErrorFlag] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("");
+  const [isSignedUp, setIsSignedUp] = React.useState<boolean>(false);
+  const [newUserId, setNewUserId] = React.useState<number>(0);
+  const [errorFlag, setErrorFlag] = React.useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>("");
   const [values, setValues] = React.useState<State>({
     amount: "",
     password: "",
@@ -65,28 +66,109 @@ export default function Register() {
     weightRange: "",
     showPassword: false,
   });
+  const [email, setEmail] = React.useState<string | null>("");
+  const [password, setPassword] = React.useState<string | null>("");
+  const newFile = new File([], "Empty File");
+  const [uploadFile, setUploadFile] = React.useState<File>(newFile);
+  const [fileExt, setFileExt] = React.useState<string>("");
+  const [image, setImage] = React.useState<string>(defaultImageUrl);
+  const id = null;
+  const getImageURL = "";
+  const [isSignedIn, setIsSignedIn] = React.useState(
+    sessionStorage.getItem("token") !== null
+  );
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+
+    console.log("email", data.get("email"));
+
+    console.log("password: ", password);
+
     axios
       .post("http://localhost:4941/api/v1/users/register", {
         firstName: data.get("firstName"),
         lastName: data.get("lastName"),
         email: data.get("email"),
-        password: data.get("password"),
+        password: password,
       })
       .then(
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
-          console.log(response);
+
           if (response.status === 201) {
             setIsSignedUp(true);
+            console.log("sign up res: ", response.data["userId"]);
+
+            console.log("newUser: ", newUserId);
+            // if created an user successfully, log in the user directly
+            axios
+              .post("http://localhost:4941/api/v1/users/login", {
+                email: data.get("email"),
+                password: password,
+              })
+              .then(
+                (response) => {
+                  if (response.status === 200) {
+                    setErrorFlag(false);
+                    setErrorMessage("");
+                    sessionStorage.setItem("token", response.data["token"]);
+                    sessionStorage.setItem("userId", response.data["userId"]);
+                    setIsSignedIn(true);
+                    const newUserId = response.data["userId"];
+                    // if created a user successfully and logged in, upload user image if any
+                    let fileContentType = "";
+                    const lowerFileExt = fileExt.toLowerCase();
+                    if (lowerFileExt === "png") {
+                      fileContentType = "image/png";
+                    } else if (
+                      lowerFileExt === "jpeg" ||
+                      lowerFileExt === "jpg"
+                    ) {
+                      fileContentType = "image/jpeg";
+                    } else if (lowerFileExt === "gif") {
+                      fileContentType = "image/gif";
+                    }
+                    let addImageUrl = "";
+                    if (newUserId !== 0) {
+                      addImageUrl = `http://localhost:4941/api/v1/users/${newUserId}/image`;
+                    }
+                    const imageConfig = {
+                      headers: {
+                        "X-Authorization": `${sessionStorage.getItem("token")}`,
+                        "Content-Type": `${fileContentType}`,
+                      },
+                    };
+                    axios.put(addImageUrl, uploadFile, imageConfig).then(
+                      (response) => {
+                        console.log(
+                          "image url: ",
+                          `http://localhost:4941/api/v1/users/${newUserId}/image`
+                        );
+                        if (
+                          response.status === 201 ||
+                          response.status === 200
+                        ) {
+                          console.log("post image successful");
+                          console.log("post image response: ", response.data);
+                          setErrorFlag(false);
+                          setErrorMessage("");
+                        }
+                      },
+                      (error) => {
+                        setErrorFlag(true);
+                        setErrorMessage(error.response.statusText);
+                      }
+                    );
+                  }
+                },
+                (error) => {
+                  setErrorFlag(true);
+                  setErrorMessage(error.response.statusText);
+                }
+              );
           }
         },
         (error) => {
@@ -99,6 +181,7 @@ export default function Register() {
   const handleChange =
     (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
       setValues({ ...values, [prop]: event.target.value });
+      setPassword(event.target.value);
     };
 
   const handleClickShowPassword = () => {
@@ -114,8 +197,8 @@ export default function Register() {
     event.preventDefault();
   };
 
-  if (isSignedUp) {
-    return <Navigate to={"/Login"}></Navigate>;
+  if (isSignedIn) {
+    return <Navigate to={"/Auctions"}></Navigate>;
   } else {
     return (
       <ThemeProvider theme={theme}>
@@ -130,62 +213,73 @@ export default function Register() {
             }}
           >
             {" "}
-            <Paper sx={{ p: 5, width: 500 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
-                    <LockOutlinedIcon />
-                  </Avatar>
-                  <Typography component="h1" variant="h5">
-                    Sign up
-                  </Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Box>
-                    <label htmlFor="contained-button-file">
-                      <input
-                        style={{
-                          display: "none",
-                        }}
-                        accept="image/*"
-                        id="contained-button-file"
-                        multiple
-                        type="file"
-                        // onChange={onImageChange}
-                      />
-                      <Button variant="outlined" component="span">
-                        <Grid container spacing={2}>
-                          <Grid item xs={12}>
-                            <Box
-                              sx={{
-                                width: 100,
-                                height: 100,
-                                backgroundColor: "grey",
-                                border: "1px dashed grey",
-                                mb: 3,
-                              }}
-                            >
-                              <img
-                                alt="auction image"
-                                src="http://localhost:4941/api/v1/auctions/1/image"
-                                style={{
-                                  maxWidth: 100,
-                                  maxHeight: 100,
-                                }}
-                              ></img>
-                            </Box>
-                          </Grid>
-                          <Grid item xs={12} sx={{ p: 0, m: 0 }}>
-                            <Typography variant="caption">
-                              Click to update image
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </Button>
-                    </label>
-                  </Box>
-                </Grid>
-              </Grid>
+            <Paper sx={{ p: 5, width: 700 }}>
+              <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
+                <LockOutlinedIcon />
+              </Avatar>
+              <Typography component="h1" variant="h5">
+                Sign up
+              </Typography>
+              <Box sx={{ mt: 3 }}>
+                <UploadImage
+                  auctionImage={image}
+                  setAuctionImage={setImage}
+                  uploadFile={uploadFile}
+                  setUploadFile={setUploadFile}
+                  fileExt={fileExt}
+                  setFileExt={setFileExt}
+                  getImageURL={getImageURL}
+                  errorFlag={errorFlag}
+                  setErrorFlag={setErrorFlag}
+                  errorMessage={errorMessage}
+                  setErrorMessage={setErrorMessage}
+                  id={id}
+                ></UploadImage>
+              </Box>
+              {/*<Box>*/}
+              {/*  <label htmlFor="contained-button-file">*/}
+              {/*    <input*/}
+              {/*      style={{*/}
+              {/*        display: "none",*/}
+              {/*      }}*/}
+              {/*      accept="image/*"*/}
+              {/*      id="contained-button-file"*/}
+              {/*      multiple*/}
+              {/*      type="file"*/}
+              {/*      // onChange={onImageChange}*/}
+              {/*    />*/}
+              {/*    <Button variant="outlined" component="span">*/}
+              {/*      <Grid container spacing={2}>*/}
+              {/*        <Grid item xs={12}>*/}
+              {/*          <Box*/}
+              {/*            sx={{*/}
+              {/*              width: 100,*/}
+              {/*              height: 100,*/}
+              {/*              backgroundColor: "grey",*/}
+              {/*              border: "1px dashed grey",*/}
+              {/*              mb: 3,*/}
+              {/*            }}*/}
+              {/*          >*/}
+              {/*            <img*/}
+              {/*              alt="auction image"*/}
+              {/*              src="http://localhost:4941/api/v1/auctions/1/image"*/}
+              {/*              style={{*/}
+              {/*                maxWidth: 100,*/}
+              {/*                maxHeight: 100,*/}
+              {/*              }}*/}
+              {/*            ></img>*/}
+              {/*          </Box>*/}
+              {/*        </Grid>*/}
+              {/*        <Grid item xs={12} sx={{ p: 0, m: 0 }}>*/}
+              {/*          <Typography variant="caption">*/}
+              {/*            Click to update image*/}
+              {/*          </Typography>*/}
+              {/*        </Grid>*/}
+              {/*      </Grid>*/}
+              {/*    </Button>*/}
+              {/*  </label>*/}
+              {/*</Box>*/}
+
               <Box
                 component="form"
                 noValidate
