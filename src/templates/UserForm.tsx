@@ -1,3 +1,4 @@
+import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -13,7 +14,7 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import axios from "axios";
-import { defaultImageUrl } from "../Utility/util";
+import equals, { defaultImageUrl } from "../Utility/util";
 import UploadImage from "./UploadImage";
 
 export default function UserForm() {
@@ -38,18 +39,13 @@ export default function UserForm() {
   const id = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("token");
   const config = { headers: { "X-Authorization": `${token}` } };
-  const getImageURL = "http://localhost:4941/api/v1/users/${id}/image";
+  const getImageURL = `http://localhost:4941/api/v1/users/${id}/image`;
 
   React.useEffect(() => {
     getUser();
-    console.log(
-      "firstName:",
-      firstName,
-      "lastName:",
-      lastName,
-      "email:",
-      email
-    );
+    if (id !== null && parseInt(id) > 0) {
+      getImage();
+    }
   }, []);
 
   const getUser = () => {
@@ -70,6 +66,28 @@ export default function UserForm() {
         setErrorMessage(error.response.statusText);
       }
     );
+  };
+
+  // get image from back end and set photoURL
+  const getImage = () => {
+    axios
+      .get(getImageURL, {
+        responseType: "blob",
+      })
+      .then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+          const photoUrl = URL.createObjectURL(response.data);
+          if (!equals(photoUrl, image)) {
+            setImage(photoUrl);
+          }
+        },
+        (error) => {
+          setErrorFlag(true);
+          setErrorMessage(error.response.statusText);
+        }
+      );
   };
 
   const patchUserProfile = () => {
@@ -144,6 +162,23 @@ export default function UserForm() {
     setOpen(false);
   };
 
+  const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files !== null) {
+      const uploadFile = e.target.files[0];
+      setImage(URL.createObjectURL(uploadFile));
+      setUploadFile(uploadFile);
+      const fileSplits = uploadFile.name.split(".");
+      if (fileSplits !== undefined) {
+        const uploadFileExt = fileSplits.pop();
+        console.log(fileSplits);
+        console.log(uploadFileExt);
+        if (uploadFileExt !== undefined) {
+          setFileExt(uploadFileExt);
+        }
+      }
+    }
+  };
+
   // if (auctionIsUpdated) {
   //   return <Navigate to={"/MyAuctions"}></Navigate>;
   // } else {
@@ -163,64 +198,57 @@ export default function UserForm() {
           </Typography>
         </div>
         <div>
-          {/*<Box>*/}
-          {/*  <label htmlFor="contained-button-file">*/}
-          {/*    <input*/}
-          {/*      style={{*/}
-          {/*        display: "none",*/}
-          {/*      }}*/}
-          {/*      accept="image/*"*/}
-          {/*      id="contained-button-file"*/}
-          {/*      multiple*/}
-          {/*      type="file"*/}
-          {/*      //onChange={onImageChange}*/}
-          {/*    />*/}
-          {/*    <Button variant="outlined" component="span">*/}
-          {/*      <Grid container spacing={2}>*/}
-          {/*        <Grid item xs={12}>*/}
-          {/*          <Box*/}
-          {/*            sx={{*/}
-          {/*              width: 600,*/}
-          {/*              height: 450,*/}
-          {/*              backgroundColor: "grey",*/}
-          {/*              border: "1px dashed grey",*/}
-          {/*              mb: 3,*/}
-          {/*            }}*/}
-          {/*          >*/}
-          {/*            <img*/}
-          {/*              alt="auction image"*/}
-          {/*              src="http://localhost:4941/api/v1/auctions/1/image"*/}
-          {/*              style={{*/}
-          {/*                maxWidth: 600,*/}
-          {/*                maxHeight: 450,*/}
-          {/*              }}*/}
-          {/*            ></img>*/}
-          {/*          </Box>*/}
-          {/*        </Grid>*/}
-          {/*        <Grid item xs={12}>*/}
-          {/*          <Typography variant="body2">*/}
-          {/*            Click to update image*/}
-          {/*          </Typography>*/}
-          {/*        </Grid>*/}
-          {/*      </Grid>*/}
-          {/*    </Button>*/}
-          {/*  </label>*/}
-          {/*</Box>*/}
-
-          <UploadImage
-            auctionImage={image}
-            setAuctionImage={setImage}
-            uploadFile={uploadFile}
-            setUploadFile={setUploadFile}
-            fileExt={fileExt}
-            setFileExt={setFileExt}
-            getImageURL={getImageURL}
-            errorFlag={errorFlag}
-            setErrorFlag={setErrorFlag}
-            errorMessage={errorMessage}
-            setErrorMessage={setErrorMessage}
-            id={id}
-          ></UploadImage>
+          {/*<UploadImage*/}
+          {/*  image={image}*/}
+          {/*  setImage={setImage}*/}
+          {/*  uploadFile={uploadFile}*/}
+          {/*  setUploadFile={setUploadFile}*/}
+          {/*  fileExt={fileExt}*/}
+          {/*  setFileExt={setFileExt}*/}
+          {/*  getImageURL={getImageURL}*/}
+          {/*  errorFlag={errorFlag}*/}
+          {/*  setErrorFlag={setErrorFlag}*/}
+          {/*  errorMessage={errorMessage}*/}
+          {/*  setErrorMessage={setErrorMessage}*/}
+          {/*  id={id}*/}
+          {/*></UploadImage>*/}
+          <Box
+            sx={{
+              width: 800,
+              height: 450,
+              backgroundColor: "grey",
+              mb: 3,
+            }}
+          >
+            {" "}
+            {image && (
+              <img
+                alt="auction image"
+                src={image}
+                style={{
+                  maxWidth: 800,
+                  maxHeight: 450,
+                }}
+              ></img>
+            )}
+          </Box>
+          <Box>
+            <label htmlFor="contained-button-file">
+              <input
+                style={{
+                  display: "none",
+                }}
+                accept="image/*"
+                id="contained-button-file"
+                multiple
+                type="file"
+                onChange={onImageChange}
+              />
+              <Button variant="outlined" component="span">
+                Upload
+              </Button>
+            </label>
+          </Box>
         </div>
         <div>
           <Grid container spacing={2} sx={{ mb: 3, mt: 2 }}>

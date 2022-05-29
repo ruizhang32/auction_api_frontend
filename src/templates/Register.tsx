@@ -222,8 +222,8 @@ export default function Register() {
               </Typography>
               <Box sx={{ mt: 3 }}>
                 <UploadImage
-                  auctionImage={image}
-                  setAuctionImage={setImage}
+                  image={image}
+                  setImage={setImage}
                   uploadFile={uploadFile}
                   setUploadFile={setUploadFile}
                   fileExt={fileExt}
