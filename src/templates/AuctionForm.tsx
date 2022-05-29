@@ -40,6 +40,10 @@ export default function AuctionForm() {
     React.useState<boolean>(true);
   const [auctionIsUpdated, setAuctionIsUpdated] =
     React.useState<boolean>(false);
+  const [imageIsUpdated, setImageIsUpdated] =
+      React.useState<boolean>(false);
+  const [imageIsUploaded, setImageIsUploaded] =
+      React.useState<boolean>(false);
   const [auction, setAuction] = React.useState<Auction>({
     auctionId: 0,
     title: "",
@@ -74,6 +78,7 @@ export default function AuctionForm() {
       getAnAuction();
       //getImage();
       setMyAuction(auction);
+      setImageIsUploaded(false);
     }
   }, [auction]);
 
@@ -85,7 +90,7 @@ export default function AuctionForm() {
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: 7,
+      categoryId: categoryId,
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
@@ -96,6 +101,7 @@ export default function AuctionForm() {
     axios.post(addAuctionFormUrl, bodyParameters, config).then(
       (response) => {
         if (response.status === 201 || response.status === 200) {
+          setImageIsUpdated(false);
           let fileContentType = "";
           const lowerFileExt = fileExt.toLowerCase();
           if (lowerFileExt === "png") {
@@ -105,26 +111,32 @@ export default function AuctionForm() {
           } else if (lowerFileExt === "gif") {
             fileContentType = "image/gif";
           }
-          const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
-          const imageConfig = {
-            headers: {
-              "X-Authorization": `${token}`,
-              "Content-Type": `${fileContentType}`,
-            },
-          };
-          axios.put(addImageUrl, uploadFile, imageConfig).then(
-            (res) => {
-              if (response.status === 201 || response.status === 200) {
-                setErrorFlag(false);
-                setErrorMessage("");
-                // auctionIsUpdated === true if auction is created or updated
-                setAuctionIsUpdated(true);
-              }
-            },
-            (err) => {
-              throw err;
-            }
-          );
+          if(fileContentType !== ""){
+            const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
+            const imageConfig = {
+              headers: {
+                "X-Authorization": `${token}`,
+                "Content-Type": `${fileContentType}`,
+              },
+            };
+            axios.put(addImageUrl, uploadFile, imageConfig).then(
+                (res) => {
+                  if (response.status === 201 || response.status === 200) {
+                    setErrorFlag(false);
+                    setErrorMessage("");
+                    // auctionIsUpdated === true if auction is created or updated
+                    setAuctionIsUpdated(true);
+                    setImageIsUpdated(true);
+                  }
+                },
+                (err) => {
+                  throw err;
+                }
+            );
+          }
+          if(!auctionIsUpdated){
+            throw new Error("Image not updated");
+          }
         }
       },
       (error) => {
@@ -140,47 +152,19 @@ export default function AuctionForm() {
       .replace("T", " ")
       .substring(0, 19);
 
-    const bodyParameters = {
-      title: "",
-      categoryId: "",
-      reserve: "",
-      endDate: "",
-      description: "",
+    let bodyParameters = {
+      title: auctionTitle,
+      categoryId: categoryId,
+      reserve: reservePrice,
+      endDate: dbFormatDate,
+      description: description,
       sellerId: sellerId,
     };
 
-    if (auctionTitle !== "") {
-      bodyParameters["title"] = auctionTitle;
-    } else {
-      setIsTitleValidate(false);
-    }
-    if (categoryId !== undefined && parseInt(categoryId) !== 0) {
-      bodyParameters["categoryId"] = categoryId;
-    } else {
-      setIsCategoryValidate(false);
-    }
-    if (reservePrice !== "") {
-      bodyParameters["reserve"] = reservePrice;
-    } else {
-      setIsReservePriceValidate(false);
-    }
-    if (dbFormatDate !== "") {
-      bodyParameters["endDate"] = dbFormatDate;
-    } else {
-      setIsEndDateValidate(false);
-    }
-    if (description !== "") {
-      bodyParameters["description"] = description;
-    } else {
-      setIsDescriptionValidate(false);
-    }
-
-    axios
-      .put("http://localhost:4941/api/v1/auctions/", bodyParameters, config)
+     axios
+      .put("http://localhost:4941/api/v1/auctions/" + auctionId +"/image", bodyParameters, config)
       .then(
         (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
           setAuction(response.data);
           if (response.status === 200) {
             // auctionIsUpdated === true if auction is created or updated
@@ -193,6 +177,7 @@ export default function AuctionForm() {
         }
       );
   };
+  //  setImageIsUploaded(false);
 
   const getAnAuction = () => {
     axios.get("http://localhost:4941/api/v1/auctions/" + auctionId).then(
@@ -256,35 +241,6 @@ export default function AuctionForm() {
     }
   };
 
-  // const searchId = (value: string, myArray: Array<Category>) => {
-  //   for (let i = 0; i < myArray.length; i++) {
-  //     if (myArray[i].name === value) {
-  //       return myArray[i].categoryId;
-  //     }
-  //   }
-  // };
-
-  // const getCategoryIdByName = () => {
-  //   for (let i = 0; i < categoryList.length; i++) {
-  //     if (auctionCategory === categoryList[i]["name"]) {
-  //       setCategoryId(categoryList[i]["categoryId"].toString());
-  //     }
-  //   }
-  //   for (let i = 0; i < selectedCategoryIdList.length; i++) {
-  //     if (
-  //       categoryList.some((item) => item.name === auctionCategory)
-  //     ) {
-  //       const selectedId = searchId(auctionCategory, categoryList);
-  //       selectedCategoryIdList
-  //     }
-  //   }
-  // };
-  //
-  // const handleCategoryChange = (event: SelectChangeEvent) => {
-  //   setAuctionCategory(event.target.value);
-  //   getCategoryIdByName();
-  // };
-
   // return a category list, each element is a dictionary, e.g: {"id":7,"name":"Bicycles"}
   const getCategories = () => {
     axios.get("http://localhost:4941/api/v1/auctions/categories/").then(
@@ -303,23 +259,23 @@ export default function AuctionForm() {
     );
   };
 
-  const getCategoryNames = () => {
-    let nameList: string[] = [];
-    for (let i = 0; i < categoryList.length; i++) {
-      nameList.push(categoryList[i]["name"]);
-    }
-    return nameList;
-  };
-
-  const handleCategories = (event: SelectChangeEvent<typeof categoryNames>) => {
-    const {
-      target: { value },
-    } = event;
-    setCategoryNames(
-      // On auto fill we get a string type value.
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
+  // const getCategoryNames = () => {
+  //   let nameList: string[] = [];
+  //   for (let i = 0; i < categoryList.length; i++) {
+  //     nameList.push(categoryList[i]["name"]);
+  //   }
+  //   return nameList;
+  // };
+  //
+  // const handleCategories = (event: SelectChangeEvent<typeof categoryNames>) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setCategoryNames(
+  //     // On auto fill we get a string type value.
+  //     typeof value === "string" ? value.split(",") : value
+  //   );
+  // };
 
   const handleDate = (newDateValue: Date | null) => {
     if (newDateValue !== null) {
@@ -332,40 +288,15 @@ export default function AuctionForm() {
     }
   };
 
-  // const putAuctionImage = () => {
-  //   axios
-  //     .post(
-  //       "http://localhost:4941/api/v1/auctions/" + userId + "/image",
-  //       bodyParameters,
-  //       config
-  //     )
-  //     .then(
-  //       (response) => {
-  //         setErrorFlag(false);
-  //         setErrorMessage("");
-  //         setAuction(response.data);
-  //         if (response.status === 201) {
-  //           // auctionIsUpdated === true if auction is created or updated
-  //           setAuctionIsUpdated(true);
-  //         }
-  //       },
-  //       (error) => {
-  //         setErrorFlag(true);
-  //         setErrorMessage(error.response.statusText);
-  //       }
-  //     );
-  // };
-
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null) {
       const uploadFile = e.target.files[0];
       setAuctionImage(URL.createObjectURL(uploadFile));
       setUploadFile(uploadFile);
+      setImageIsUploaded(true);
       const fileSplits = uploadFile.name.split(".");
       if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
-        console.log(fileSplits);
-        console.log(uploadFileExt);
         if (uploadFileExt !== undefined) {
           setFileExt(uploadFileExt);
         }
