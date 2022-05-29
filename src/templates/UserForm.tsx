@@ -75,18 +75,37 @@ export default function UserForm() {
       })
       .then(
         (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
           const photoUrl = URL.createObjectURL(response.data);
           if (!equals(photoUrl, image)) {
             setImage(photoUrl);
           }
         },
         (error) => {
+          setErrorMessage(error.response.statusText);
+        }
+      );
+  };
+
+  const deleteImage = () => {
+    axios
+      .delete("http://localhost:4941/api/v1/users/" + id + "/image", config)
+      .then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+        },
+        (error) => {
           setErrorFlag(true);
           setErrorMessage(error.response.statusText);
         }
       );
+  };
+
+  const handleDeleteImage = () => {
+    setImage(defaultImageUrl);
+    setUploadFile(newFile);
+    setFileExt("");
+    deleteImage();
   };
 
   const patchUserProfile = () => {
@@ -117,29 +136,45 @@ export default function UserForm() {
       );
   };
 
-  // const putAuctionImage = () => {
-  //   axios
-  //     .post(
-  //       "http://localhost:4941/api/v1/auctions/" + userId + "/image",
-  //       bodyParameters,
-  //       config
-  //     )
-  //     .then(
-  //       (response) => {
-  //         setErrorFlag(false);
-  //         setErrorMessage("");
-  //         setAuction(response.data);
-  //         if (response.status === 201) {
-  //           // auctionIsUpdated === true if auction is created or updated
-  //           setAuctionIsUpdated(true);
-  //         }
-  //       },
-  //       (error) => {
-  //         setErrorFlag(true);
-  //         setErrorMessage(error.response.statusText);
-  //       }
-  //     );
-  // };
+  const putAuctionImage = () => {
+    let fileContentType = "";
+    const lowerFileExt = fileExt.toLowerCase();
+    if (lowerFileExt === "png") {
+      fileContentType = "image/png";
+    } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+      fileContentType = "image/jpeg";
+    } else if (lowerFileExt === "gif") {
+      fileContentType = "image/gif";
+    }
+    let addImageUrl = "";
+    if (id !== null) {
+      addImageUrl = `http://localhost:4941/api/v1/users/${id}/image`;
+    }
+    const imageConfig = {
+      headers: {
+        "X-Authorization": `${sessionStorage.getItem("token")}`,
+        "Content-Type": `${fileContentType}`,
+      },
+    };
+    axios.put(addImageUrl, uploadFile, imageConfig).then(
+      (response) => {
+        console.log(
+          "image url: ",
+          `http://localhost:4941/api/v1/users/${id}/image`
+        );
+        if (response.status === 201 || response.status === 200) {
+          console.log("post image successful");
+          console.log("post image response: ", response.data);
+          setErrorFlag(false);
+          setErrorMessage("");
+        }
+      },
+      (error) => {
+        setErrorFlag(true);
+        setErrorMessage(error.response.statusText);
+      }
+    );
+  };
 
   // const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   //   if (e.target.files !== null) {
@@ -150,7 +185,8 @@ export default function UserForm() {
   // };
 
   const handleEdit = () => {
-    //putUserProfile();
+    patchUserProfile();
+    putAuctionImage();
   };
 
   const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -197,20 +233,6 @@ export default function UserForm() {
           </Typography>
         </div>
         <div>
-          {/*<UploadImage*/}
-          {/*  image={image}*/}
-          {/*  setImage={setImage}*/}
-          {/*  uploadFile={uploadFile}*/}
-          {/*  setUploadFile={setUploadFile}*/}
-          {/*  fileExt={fileExt}*/}
-          {/*  setFileExt={setFileExt}*/}
-          {/*  getImageURL={getImageURL}*/}
-          {/*  errorFlag={errorFlag}*/}
-          {/*  setErrorFlag={setErrorFlag}*/}
-          {/*  errorMessage={errorMessage}*/}
-          {/*  setErrorMessage={setErrorMessage}*/}
-          {/*  id={id}*/}
-          {/*></UploadImage>*/}
           <Box
             sx={{
               width: 800,
@@ -232,21 +254,34 @@ export default function UserForm() {
             )}
           </Box>
           <Box>
-            <label htmlFor="contained-button-file">
-              <input
-                style={{
-                  display: "none",
-                }}
-                accept="image/*"
-                id="contained-button-file"
-                multiple
-                type="file"
-                onChange={onImageChange}
-              />
-              <Button variant="outlined" component="span">
-                Upload
-              </Button>
-            </label>
+            <Grid container spacing={2}>
+              <Grid item xs={2}>
+                <label htmlFor="contained-button-file">
+                  <input
+                    style={{
+                      display: "none",
+                    }}
+                    accept="image/*"
+                    id="contained-button-file"
+                    multiple
+                    type="file"
+                    onChange={onImageChange}
+                  />
+                  <Button variant="outlined" component="span">
+                    Upload Image
+                  </Button>
+                </label>
+              </Grid>
+              <Grid item xs={2}>
+                <Button
+                  variant="outlined"
+                  component="span"
+                  onClick={handleDeleteImage}
+                >
+                  Delete Image
+                </Button>
+              </Grid>
+            </Grid>
           </Box>
         </div>
         <div>
@@ -371,7 +406,7 @@ export default function UserForm() {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button onClick={patchUserProfile}>Summit</Button>
+              <Button onClick={handleEdit}>Summit</Button>
             </DialogActions>
             <div hidden={!errorFlag}>
               <Alert severity="error">
