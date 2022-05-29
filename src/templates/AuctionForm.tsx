@@ -72,40 +72,20 @@ export default function AuctionForm() {
     // getCategoryIdByName();
     if(auctionId !== undefined && parseInt(auctionId) > 0){
       getAnAuction();
+      getImage();
       setMyAuction(auction);
     }
-    console.log(
-      "selectedCategoryIdList: ",
-      selectedCategoryIdList,
-      "title:",
-      auctionTitle,
-      "categoryId:",
-      categoryId,
-      "reserve:",
-      reservePrice,
-      "endDate:",
-      // date.toISOString().replace("T", " ").substring(0, 19),
-      "description:",
-      description,
-      "sellerId:",
-      sellerId,
-      "auctionCategory:",
-      auctionCategory,
-      "image: ",
-      auctionImage,
-      "auctionId",
-      auctionId
-    );
   }, [
-    auctionId,
-    auctionCategory,
-    auctionTitle,
-    auctionImage,
-    reservePrice,
-    description,
-    date,
-    categoryId,
-    categoryNames,
+    // auctionId,
+    // auctionCategory,
+    // auctionTitle,
+    // auctionImage,
+    // reservePrice,
+    // description,
+    // date,
+    // categoryId,
+    // categoryNames,
+      auction
   ]);
 
   const postAnAuction = () => {
@@ -116,7 +96,7 @@ export default function AuctionForm() {
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: categoryId,
+      categoryId: 7,
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
@@ -175,18 +155,18 @@ export default function AuctionForm() {
       .then(
         (response) => {
           if (response.status === 201 || response.status === 200) {
-            let fileEContentType = "";
-            if(fileExt === "png"){
-              fileEContentType = "image/png"
-            }else if(fileExt === "jpeg" || fileExt === "jpg"){
-              fileEContentType = "image/jpeg"
-            }else if(fileExt === "gif"){
-              fileEContentType = "image/gif"
+            let fileContentType = "";
+            const lowerFileExt = fileExt.toLowerCase();
+            if(lowerFileExt === "png"){
+              fileContentType = "image/png"
+            }else if(lowerFileExt === "jpeg" || lowerFileExt === "jpg"){
+              fileContentType = "image/jpeg"
+            }else if(lowerFileExt === "gif"){
+              fileContentType = "image/gif"
             }
-            const addImageUrl = `{http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
-            console.log(addImageUrl);
+            const addImageUrl = `http://localhost:4941/api/v1/auctions/${response.data.auctionId}/image`;
             const imageConfig = {
-              headers: { "X-Authorization": `${token}`,  "Content-Type": `${fileEContentType}`},
+              headers: { "X-Authorization": `${token}`,  "Content-Type": `${fileContentType}`},
             };
             axios
                 .put(addImageUrl, uploadFile, imageConfig)
@@ -287,14 +267,35 @@ export default function AuctionForm() {
     );
   };
 
+  const getImage = () => {
+    axios.get(`http://localhost:4941/api/v1/auctions/${auctionId}/image`, {
+      responseType: 'blob'
+    }).then(
+        (response) => {
+          setErrorFlag(false);
+          setErrorMessage("");
+          const photoUrl = URL.createObjectURL(response.data);
+          if(!equals(photoUrl, auctionImage)){
+            setAuctionImage(photoUrl);
+          }
+        },
+        (error) => {
+          setErrorFlag(true);
+          setErrorMessage(error.response.statusText);
+        }
+    )
+  };
+
   const setMyAuction = (auction: Auction) =>{
     if(!equals(auction.title, auctionTitle)){
       setAuctionTitle(auction.title);
     }
-    // const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
-    // if(myCategory !== undefined){
-    //   setAuctionCategory(myCategory.name);
-    // }
+
+    console.log(auction.categoryId)
+    const myCategory = categoryList.find(x => x.categoryId === auction.categoryId);
+    if(myCategory !== undefined){
+      setAuctionCategory(myCategory.name);
+    }
     if(!equals(new Date(auction.endDate), date)){
       setDate(new Date(auction.endDate));
     }
@@ -342,11 +343,9 @@ export default function AuctionForm() {
         setErrorFlag(false);
         setErrorMessage("");
         const categoryObjects : Array<Category> = response.data;
-        console.log(categoryObjects)
         if(!equals(categoryObjects, categoryList)){
           setCategoryList(categoryObjects);
         }
-        console.log(categoryList)
       },
       (error) => {
         setErrorFlag(true);
@@ -413,10 +412,11 @@ export default function AuctionForm() {
       const uploadFile = e.target.files[0];
       setAuctionImage(URL.createObjectURL(uploadFile));
       setUploadFile(uploadFile);
-      console.log(uploadFile);
       const fileSplits = uploadFile.name.split('.');
       if(fileSplits !== undefined){
         const uploadFileExt = fileSplits.pop();
+        console.log(fileSplits)
+        console.log(uploadFileExt)
         if(uploadFileExt !== undefined){
           setFileExt(uploadFileExt);
         }
