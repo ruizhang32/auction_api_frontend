@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Paper,
   Table,
@@ -46,8 +45,8 @@ export default function AnAuction() {
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
-  const token = sessionStorage.getItem("token");
-  const userId = sessionStorage.getItem("userId");
+  const token: string | null = sessionStorage.getItem("token");
+  const loggedInUserId: string | null = sessionStorage.getItem("userId");
   const config = {
     headers: { "X-Authorization": `${token}` },
   };
@@ -126,27 +125,41 @@ export default function AnAuction() {
       amount: 0,
     };
 
-    bodyParameter["amount"] = parseFloat(bidAmount);
-
-    axios
-      .post(
-        "http://localhost:4941/api/v1/auctions/" + auctionId + "/bids",
-        bodyParameter,
-        config
-      )
-      .then(
-        (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
-          setBidAmount("");
-          setNumBids(numBids + 1);
-          getAuctionBidders();
-        },
-        (error) => {
-          setErrorFlag(true);
-          setErrorMessage(error.response.statusText);
-        }
-      );
+    if (loggedInUserId === null) {
+      setErrorMessage("Please log in first");
+      setErrorFlag(true);
+    }
+    if (bidAmount.includes(".")) {
+      setErrorFlag(true);
+      setErrorMessage("Users can not make fractional bids");
+    } else {
+      console.log("parseInt(bidAmount): ", parseInt(bidAmount));
+      if (parseInt(bidAmount) === 0) {
+        setErrorFlag(true);
+        setErrorMessage("Can not make a bid below or equal to $0");
+      } else {
+        bodyParameter["amount"] = parseFloat(bidAmount);
+        axios
+          .post(
+            "http://localhost:4941/api/v1/auctions/" + auctionId + "/bids",
+            bodyParameter,
+            config
+          )
+          .then(
+            () => {
+              setErrorFlag(false);
+              setErrorMessage("");
+              setBidAmount("");
+              setNumBids(numBids + 1);
+              getAuctionBidders();
+            },
+            (error) => {
+              setErrorFlag(true);
+              setErrorMessage(error.response.statusText);
+            }
+          );
+      }
+    }
   };
 
   const getAuctionBidders = () => {
