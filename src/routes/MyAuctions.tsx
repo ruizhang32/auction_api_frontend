@@ -20,13 +20,12 @@ import React from "react";
 import axios from "axios";
 import AppBar from "../templates/AppBar";
 import Footer from "../templates/Footer";
-import { Link, useParams, useNavigate, Navigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import equals from "../Utility/util";
 
 const MyAuctions = () => {
-  const { userId } = useParams();
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
-  const [bids, setBids] = React.useState<Array<Auction>>([]);
+  const [auctionsIBid, setAuctionsIBid] = React.useState<Array<Auction>>([]);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
@@ -75,8 +74,9 @@ const MyAuctions = () => {
 
   React.useEffect(() => {
     getAuctions();
-    getBids();
-  }, [auctions, bids]);
+    getMyBids();
+    console.log("bids: ", auctionsIBid, "loggedInUserId: ", loggedInUserId);
+  }, [auctions, auctionsIBid]);
 
   const getAuctions = () => {
     axios.get("http://localhost:4941/api/v1/auctions").then(
@@ -103,16 +103,17 @@ const MyAuctions = () => {
     });
   };
 
-  const getBids = () => {
+  const getMyBids = () => {
     axios
-      .get("http://localhost:4941/api/v1/auctions/" + loggedInUserId + "/bids")
+      .get("http://localhost:4941/api/v1/auctions?bidderId=" + loggedInUserId)
       .then(
         (response) => {
           setErrorFlag(false);
           setErrorMessage("");
-          const fetchedBids = response.data;
-          if (!equals(fetchedBids, bids)) {
-            setBids(fetchedBids);
+          const fetchedBids = response.data["auctions"];
+          console.log("fetchedBids: ", response.data);
+          if (!equals(fetchedBids, auctionsIBid)) {
+            setAuctionsIBid(fetchedBids);
           }
         },
         (error) => {
@@ -122,11 +123,11 @@ const MyAuctions = () => {
       );
   };
 
-  const getMyBids = () => {
-    return bids.filter(function (bidItems) {
-      return bidItems.sellerId === parseInt(loggedInUserId as string);
-    });
-  };
+  // const getMyBids = () => {
+  //   return bids.filter(function (bidItems) {
+  //     return bidItems.sellerId === parseInt(loggedInUserId as string);
+  //   });
+  // };
 
   const deleteAuction = (auction: Auction) => {
     axios
@@ -135,7 +136,7 @@ const MyAuctions = () => {
         config
       )
       .then(
-        (response) => {
+        () => {
           setErrorFlag(false);
           setErrorMessage("");
           setOpenDeleteDialog(false);
@@ -156,7 +157,6 @@ const MyAuctions = () => {
   };
 
   if (loggedInUserId === null) {
-    console.log("loggedInUserId !== null", loggedInUserId !== null);
     return <Navigate to={"/Login"}></Navigate>;
   } else {
     return (
@@ -272,22 +272,23 @@ const MyAuctions = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {getMyBids().map((myBid) => (
+                {auctionsIBid.map((bid) => (
                   <TableRow
-                    key={myBid.auctionId}
+                    key={bid.auctionId}
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell component="th" scope="row">
-                      {myBid.title}
+                      {bid.title}
                     </TableCell>
-                    <TableCell align="right">{myBid.endDate}</TableCell>
-                    <TableCell align="right">{myBid.categoryId}</TableCell>
                     <TableCell align="right">
-                      {myBid.sellerFirstName}
-                      {myBid.sellerLastName}
+                      {bid.endDate.replace("T", "").toString().substring(0, 10)}
                     </TableCell>
-                    <TableCell align="right">{myBid.highestBid}</TableCell>
-                    <TableCell align="right">{myBid.reserve}</TableCell>
+                    <TableCell align="right">{bid.categoryId}</TableCell>
+                    <TableCell align="right">
+                      {bid.sellerFirstName} {bid.sellerLastName}
+                    </TableCell>
+                    <TableCell align="right">{bid.highestBid}</TableCell>
+                    <TableCell align="right">{bid.reserve}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
