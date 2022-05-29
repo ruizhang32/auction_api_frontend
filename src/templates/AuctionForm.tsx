@@ -127,12 +127,14 @@ export default function AuctionForm() {
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: categoryId,
+      categoryId: calcCategory(selectedCategoryIdList),
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
       sellerId: sellerId,
     };
+
+    console.log(bodyParameters);
 
     const addAuctionFormUrl = "http://localhost:4941/api/v1/auctions/";
     axios.post(addAuctionFormUrl, bodyParameters, config).then(

@@ -136,9 +136,9 @@ export default function UserForm() {
       );
   };
 
-  const putAuctionImage = () => {
+  const putAuctionImage = (myFileExt: string, myUploadFile: File) => {
     let fileContentType = "";
-    const lowerFileExt = fileExt.toLowerCase();
+    const lowerFileExt = myFileExt.toLowerCase();
     if (lowerFileExt === "png") {
       fileContentType = "image/png";
     } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
@@ -149,22 +149,20 @@ export default function UserForm() {
     let addImageUrl = "";
     if (id !== null) {
       addImageUrl = `http://localhost:4941/api/v1/users/${id}/image`;
-    }
+    }console.log(
+        "image url: ",
+        `http://localhost:4941/api/v1/users/${id}/image`
+    );
+
     const imageConfig = {
       headers: {
         "X-Authorization": `${sessionStorage.getItem("token")}`,
         "Content-Type": `${fileContentType}`,
       },
     };
-    axios.put(addImageUrl, uploadFile, imageConfig).then(
+    axios.put(addImageUrl, myUploadFile, imageConfig).then(
       (response) => {
-        console.log(
-          "image url: ",
-          `http://localhost:4941/api/v1/users/${id}/image`
-        );
         if (response.status === 201 || response.status === 200) {
-          console.log("post image successful");
-          console.log("post image response: ", response.data);
           setErrorFlag(false);
           setErrorMessage("");
         }
@@ -186,7 +184,7 @@ export default function UserForm() {
 
   const handleEdit = () => {
     patchUserProfile();
-    putAuctionImage();
+
   };
 
   const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -199,18 +197,16 @@ export default function UserForm() {
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null) {
-      const uploadFile = e.target.files[0];
-      setImage(URL.createObjectURL(uploadFile));
-      setUploadFile(uploadFile);
-      const fileSplits = uploadFile.name.split(".");
+      const myUploadFile = e.target.files[0];
+      setImage(URL.createObjectURL(myUploadFile));
+      const fileSplits = myUploadFile.name.split(".");
       if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
-        console.log(fileSplits);
-        console.log(uploadFileExt);
         if (uploadFileExt !== undefined) {
-          setFileExt(uploadFileExt);
+          putAuctionImage(uploadFileExt, myUploadFile);
         }
       }
+
     }
   };
 

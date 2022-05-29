@@ -267,7 +267,7 @@ const MyAuctions = () => {
                             variant="outlined"
                             color="error"
                             onClick={() => {
-                              deleteAuction(myAuction);
+                              deleteAuction(dialogAuction);
                             }}
                             autoFocus
                           >
