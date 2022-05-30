@@ -32,11 +32,15 @@ export default function SelectCategory(props: ICategoryProps) {
         setErrorFlag(false);
         setErrorMessage("");
         setAllCategoryList(response.data);
+        console.log("props.selectedCategoryId", props.selectedCategoryId);
+        console.log("response.data", response.data);
         const myCategoryNameList = getCategoryNamesByIds(
           [props.selectedCategoryId],
-          allCategoryList
+          response.data
         );
-        if (!equals(myCategoryNameList, categoryName)) {
+        console.log("myCategoryNameList", myCategoryNameList[0]);
+        console.log("categoryName", categoryName);
+        if (!equals(myCategoryNameList[0], categoryName)) {
           setCategoryName(myCategoryNameList[0]);
         }
       },
@@ -48,10 +52,10 @@ export default function SelectCategory(props: ICategoryProps) {
   };
 
   const handleCategoryChange = (event: SelectChangeEvent) => {
-    const categoryName: string = event.target.value;
-    setCategoryName(categoryName);
+    const myCategoryName: string = event.target.value;
+    setCategoryName(myCategoryName);
     const selectCategoryId: string = getCategoryIdsByNames(
-      [categoryName],
+      [myCategoryName],
       allCategoryList
     )[0];
     props.setSelectedCategoryId(selectCategoryId);

@@ -37,10 +37,12 @@ export function getCategoryNamesByIds(
 ): Array<string> {
   let result: Array<string> = [""];
   categoryIdLists.forEach((categoryId) => {
+    console.log("categoryId", categoryId);
     if (categoryId !== "") {
       result.push(categoryIdName[parseInt(categoryId) - 1].name);
     }
   });
+  console.log(result);
   return result;
 }
 

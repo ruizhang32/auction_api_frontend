@@ -78,29 +78,16 @@ export default function AuctionForm() {
       getAnAuction();
       getImage();
       setMyAuction(auction);
-      setImageIsUploaded(false);
     }
-  }, [auction, fileExt, isImageValidate]);
+    console.log(selectedCategoryId);
+  }, [auction]);
 
   function uploadImage(myAuctionId: number) {
+    console.log("upload image imageIsUploaded", imageIsUploaded);
     if (!imageIsUploaded) {
       return;
     }
     imageIsUpdated = false;
-    // let fileContentType = "";
-    // const lowerFileExt = fileExt.toLowerCase();
-    // if (lowerFileExt === "png") {
-    //   fileContentType = "image/png";
-    //   setIsImageValidate(1);
-    // } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
-    //   fileContentType = "image/jpeg";
-    //   setIsImageValidate(1);
-    // } else if (lowerFileExt === "gif") {
-    //   fileContentType = "image/gif";
-    //   setIsImageValidate(1);
-    // } else {
-    //   setIsImageValidate(2);
-    // }
     if (fileContentType !== "" && isImageValidate === 1) {
       const addImageUrl = `http://localhost:4941/api/v1/auctions/${myAuctionId}/image`;
       const imageConfig = {
@@ -131,7 +118,6 @@ export default function AuctionForm() {
       return;
     }
     const dbFormatDate: string = formatDate(date);
-
     let bodyParameters: {};
     if (reservePrice !== "") {
       bodyParameters = {
@@ -151,8 +137,6 @@ export default function AuctionForm() {
         sellerId: sellerId,
       };
     }
-
-    console.log(bodyParameters);
 
     const addAuctionFormUrl = "http://localhost:4941/api/v1/auctions/";
     axios.post(addAuctionFormUrl, bodyParameters, config).then(
@@ -202,9 +186,9 @@ export default function AuctionForm() {
       )
       .then(
         (response) => {
+          console.log("setImageIsUploaded", imageIsUploaded);
           // setAuction(response.data);
           if (response.status === 200) {
-            // auctionIsUpdated === true if auction is created or updated
             setAuctionIsUpdated(true);
             if (auctionId !== undefined) {
               uploadImage(parseInt(auctionId));
@@ -261,12 +245,6 @@ export default function AuctionForm() {
       setAuctionTitle(auction.title);
     }
 
-    console.log(auction.categoryId);
-    // const myCategoryLists = calcCategories(auction.categoryId);
-    // if (!equals(myCategoryLists, selectedCategoryIdList)) {
-    //   setSelectedCategoryIdList(myCategoryLists);
-    // }
-
     const myCategory = auction.categoryId.toString();
     if (!equals(myCategory, selectedCategoryId)) {
       setSelectedCategoryId(myCategory);
@@ -290,6 +268,7 @@ export default function AuctionForm() {
         setErrorFlag(false);
         setErrorMessage("");
         const categoryObjects: Array<Category> = response.data;
+        console.log("catas", categoryObjects);
         if (!equals(categoryObjects, categoryList)) {
           setCategoryList(categoryObjects);
         }
@@ -317,38 +296,46 @@ export default function AuctionForm() {
       const uploadFile = e.target.files[0];
       setAuctionImage(URL.createObjectURL(uploadFile));
       setUploadFile(uploadFile);
-      setImageIsUploaded(true);
       const fileSplits = uploadFile.name.split(".");
-      console.log("fileSplits: ", fileSplits);
+
       if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
-        console.log("uploadFileExt: ", uploadFileExt);
         if (uploadFileExt !== undefined) {
           setFileExt(uploadFileExt);
-
           // check if uploaded image is a valid type, if not, set flag to 2
           const lowerFileExt = uploadFileExt.toLowerCase();
-          console.log("lowerFileExt: ", lowerFileExt);
           if (lowerFileExt === "png") {
             setFileContentType("image/png");
             setIsImageValidate(1);
+            setImageIsUploaded(true);
           } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
             setFileContentType("image/jpeg");
             setIsImageValidate(1);
+            setImageIsUploaded(true);
           } else if (lowerFileExt === "gif") {
             setFileContentType("image/gif");
             setIsImageValidate(1);
+            setImageIsUploaded(true);
           } else {
-            console.log("hey");
             setIsImageValidate(2);
-            console.log("IsImageValidate: ", isImageValidate);
+            setImageIsUploaded(false);
           }
+        } else {
+          setIsImageValidate(2);
+          setImageIsUploaded(false);
         }
+      } else {
+        setImageIsUploaded(false);
       }
     }
   };
 
   const handleSummit = () => {
+    if (isImageValidate === 2) {
+      setErrorFlag(true);
+      setErrorMessage("Invalid image type");
+      return;
+    }
     if (isNewAuction) {
       postAnAuction();
     } else {
@@ -542,7 +529,7 @@ export default function AuctionForm() {
             {/*  </Alert>*/}
             {/*</div>*/}
           </div>
-          <div hidden={errorFlag}>
+          <div hidden={!errorFlag}>
             <Alert
               variant="outlined"
               severity="error"
