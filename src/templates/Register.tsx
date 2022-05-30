@@ -23,7 +23,7 @@ import {
   OutlinedInput,
   Paper,
 } from "@mui/material";
-import { defaultImageUrl } from "../Utility/util";
+import { defaultImageUrl } from "../utility/util";
 
 interface State {
   amount: string;
@@ -65,14 +65,11 @@ export default function Register() {
     weightRange: "",
     showPassword: false,
   });
-  const [email, setEmail] = React.useState<string | null>("");
   const [password, setPassword] = React.useState<string | null>("");
   const newFile = new File([], "Empty File");
   const [uploadFile, setUploadFile] = React.useState<File>(newFile);
   const [fileExt, setFileExt] = React.useState<string>("");
   const [image, setImage] = React.useState<string>(defaultImageUrl);
-  const id = null;
-  const getImageURL = "";
   const [isSignedIn, setIsSignedIn] = React.useState(
     sessionStorage.getItem("token") !== null
   );
@@ -102,7 +99,7 @@ export default function Register() {
             console.log("sign up res: ", response.data["userId"]);
 
             console.log("newUser: ", newUserId);
-            // if created an user successfully, log in the user directly
+            // if created a user successfully, log in the user directly
             axios
               .post("http://localhost:4941/api/v1/users/login", {
                 email: data.get("email"),
@@ -296,50 +293,6 @@ export default function Register() {
                   </Box>
                 </div>
               </Box>
-              {/*<Box>*/}
-              {/*  <label htmlFor="contained-button-file">*/}
-              {/*    <input*/}
-              {/*      style={{*/}
-              {/*        display: "none",*/}
-              {/*      }}*/}
-              {/*      accept="image/*"*/}
-              {/*      id="contained-button-file"*/}
-              {/*      multiple*/}
-              {/*      type="file"*/}
-              {/*      // onChange={onImageChange}*/}
-              {/*    />*/}
-              {/*    <Button variant="outlined" component="span">*/}
-              {/*      <Grid container spacing={2}>*/}
-              {/*        <Grid item xs={12}>*/}
-              {/*          <Box*/}
-              {/*            sx={{*/}
-              {/*              width: 100,*/}
-              {/*              height: 100,*/}
-              {/*              backgroundColor: "grey",*/}
-              {/*              border: "1px dashed grey",*/}
-              {/*              mb: 3,*/}
-              {/*            }}*/}
-              {/*          >*/}
-              {/*            <img*/}
-              {/*              alt="auction image"*/}
-              {/*              src="http://localhost:4941/api/v1/auctions/1/image"*/}
-              {/*              style={{*/}
-              {/*                maxWidth: 100,*/}
-              {/*                maxHeight: 100,*/}
-              {/*              }}*/}
-              {/*            ></img>*/}
-              {/*          </Box>*/}
-              {/*        </Grid>*/}
-              {/*        <Grid item xs={12} sx={{ p: 0, m: 0 }}>*/}
-              {/*          <Typography variant="caption">*/}
-              {/*            Click to update image*/}
-              {/*          </Typography>*/}
-              {/*        </Grid>*/}
-              {/*      </Grid>*/}
-              {/*    </Button>*/}
-              {/*  </label>*/}
-              {/*</Box>*/}
-
               <Box
                 component="form"
                 noValidate

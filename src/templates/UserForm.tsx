@@ -14,10 +14,9 @@ import {
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import axios from "axios";
-import equals, { defaultImageUrl } from "../Utility/util";
+import equals, { defaultImageUrl } from "../utility/util";
 
 export default function UserForm() {
-  let file = new File([new Blob()], "default image");
   const [firstName, setFirstName] = React.useState<string>("");
   const [lastName, setLastName] = React.useState<string>("");
   const [email, setEmail] = React.useState<string>("");
@@ -27,7 +26,6 @@ export default function UserForm() {
   const [myEmail, setMyEmail] = React.useState<string>("");
   const [myCurrentPassword, setMyCurrentPassword] = React.useState<string>("");
   const [myPassword, setMyPassword] = React.useState<string>("");
-  //const [userImage, setUserImage] = React.useState<File>(file);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [open, setOpen] = React.useState(false);
@@ -90,7 +88,7 @@ export default function UserForm() {
     axios
       .delete("http://localhost:4941/api/v1/users/" + id + "/image", config)
       .then(
-        (response) => {
+        () => {
           setErrorFlag(false);
           setErrorMessage("");
         },
@@ -149,9 +147,10 @@ export default function UserForm() {
     let addImageUrl = "";
     if (id !== null) {
       addImageUrl = `http://localhost:4941/api/v1/users/${id}/image`;
-    }console.log(
-        "image url: ",
-        `http://localhost:4941/api/v1/users/${id}/image`
+    }
+    console.log(
+      "image url: ",
+      `http://localhost:4941/api/v1/users/${id}/image`
     );
 
     const imageConfig = {
@@ -174,20 +173,11 @@ export default function UserForm() {
     );
   };
 
-  // const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files !== null) {
-  //     setAuctionImage(e.target.files[0]);
-  //     console.log();
-  //   }
-  //   // TODO: else
-  // };
-
   const handleEdit = () => {
     patchUserProfile();
-
   };
 
-  const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleOpen = () => {
     setOpen(true);
   };
 
@@ -206,7 +196,6 @@ export default function UserForm() {
           putAuctionImage(uploadFileExt, myUploadFile);
         }
       }
-
     }
   };
 
@@ -415,5 +404,4 @@ export default function UserForm() {
       </Paper>
     </>
   );
-  // }
 }

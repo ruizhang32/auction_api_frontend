@@ -22,7 +22,7 @@ import axios from "axios";
 import AppBar from "../templates/AppBar";
 import Footer from "../templates/Footer";
 import { useNavigate, Navigate } from "react-router-dom";
-import equals from "../Utility/util";
+import equals from "../utility/util";
 
 const MyAuctions = () => {
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
@@ -53,6 +53,11 @@ const MyAuctions = () => {
     headers: { "X-Authorization": `${loggedInUserToken}` },
   };
 
+  React.useEffect(() => {
+    getAuctions();
+    getMyBids();
+  }, [auctions, auctionsIBid]);
+
   const handleDeleteDialogOpen = (auction: Auction) => {
     setDialogAuction(auction);
     setOpenDeleteDialog(true);
@@ -75,11 +80,6 @@ const MyAuctions = () => {
     });
     setOpenDeleteDialog(false);
   };
-
-  React.useEffect(() => {
-    getAuctions();
-    getMyBids();
-  }, [auctions, auctionsIBid]);
 
   const getAuctions = () => {
     axios.get("http://localhost:4941/api/v1/auctions").then(
@@ -225,14 +225,8 @@ const MyAuctions = () => {
                       >
                         Edit
                       </Button>
-                      {/*</div>*/}
                     </TableCell>
                     <TableCell align="left">
-                      {/*<div*/}
-                      {/*  hidden={idOfAuctionsWithBids.includes(*/}
-                      {/*    myAuction.auctionId*/}
-                      {/*  )}*/}
-                      {/*>*/}
                       <Button
                         disabled={idOfAuctionsWithBids.includes(
                           myAuction.auctionId
@@ -245,7 +239,6 @@ const MyAuctions = () => {
                       >
                         Delete
                       </Button>
-                      {/*</div>*/}
                       <Dialog
                         open={openDeleteDialog}
                         onClose={handleDeleteDialogClose}

@@ -71,7 +71,7 @@ export default function Footer() {
             <ul>
               {footer.description.map((item) => (
                 <li key={item}>
-                  <Link to="/login">{item}</Link>
+                  <Link to="/auctions">{item}</Link>
                 </li>
               ))}
             </ul>

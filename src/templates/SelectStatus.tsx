@@ -10,8 +10,6 @@ interface IStatusProps {
 }
 
 export default function SelectStatus(props: IStatusProps) {
-  // const [auctionStatus, setAuctionStatus] = React.useState("");
-
   const handleChange = (event: SelectChangeEvent) => {
     props.setStatus(event.target.value);
   };

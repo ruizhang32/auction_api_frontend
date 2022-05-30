@@ -1,6 +1,5 @@
 import React from "react";
-import { Link, useParams } from "react-router-dom";
-import Box from "@mui/material/Box";
+import { Link } from "react-router-dom";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardActions from "@mui/material/CardActions";
@@ -25,7 +24,6 @@ interface IAuctionsProps {
 const AllAuctions = (props: IAuctionsProps) => {
   const [auctions, setAuctions] = React.useState<Array<Auction>>([]);
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
-  const [auctionImages, setAuctionImages] = React.useState<Array<Category>>([]);
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -86,7 +84,7 @@ const AllAuctions = (props: IAuctionsProps) => {
     }
     if (sortKeyWordForServer !== "") {
       if (sortKeyWordForServer === "CLOSING_") {
-        if ((sortOrderForServer = "ASC")) {
+        if (sortOrderForServer === "ASC") {
           queryList.push("sortBy=" + sortKeyWordForServer + "LAST");
         } else {
           queryList.push("sortBy=" + sortKeyWordForServer + "SOON");
@@ -171,7 +169,6 @@ const AllAuctions = (props: IAuctionsProps) => {
     }
   };
 
-  // return <Container>{list_of_auctions()}</Container>;
   if (errorFlag) {
     return (
       <div>

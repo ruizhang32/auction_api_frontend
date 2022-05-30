@@ -7,7 +7,7 @@ import axios from "axios";
 import equals, {
   getCategoryIdsByNames,
   getCategoryNamesByIds,
-} from "../Utility/util";
+} from "../utility/util";
 
 interface ICategoryProps {
   selectedCategoryId: string;
@@ -70,15 +70,11 @@ export default function SelectCategory(props: ICategoryProps) {
         <MenuItem value="">
           <em>None</em>
         </MenuItem>
-
         {allCategoryList.map((category) => (
           <MenuItem key={category.categoryId} value={category.name}>
             {category.name}
           </MenuItem>
         ))}
-
-        {/*<MenuItem value={10}>Open</MenuItem>*/}
-        {/*<MenuItem value={20}>Closed</MenuItem>*/}
       </Select>
     </FormControl>
   );

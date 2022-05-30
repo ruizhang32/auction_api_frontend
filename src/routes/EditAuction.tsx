@@ -3,7 +3,6 @@ import Container from "@mui/material/Container";
 import AppBar from "../templates/AppBar";
 import Footer from "../templates/Footer";
 import AuctionForm from "../templates/AuctionForm";
-
 import Typography from "@mui/material/Typography";
 
 const EditAuction = () => {

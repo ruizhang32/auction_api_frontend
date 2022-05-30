@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./routes/App";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./routes/Login";
 import RegisterPage from "./routes/RegisterPage";
@@ -15,16 +14,6 @@ import UserProfile from "./routes/UserProfile";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
-
-// const requireAuth (nextState, replace, next) = () => {
-//   if (!authenticated) {
-//     replace({
-//       pathname: "/login",
-//       state: {nextPathname: nextState.location.pathname}
-//     });
-//   }
-//   next();
-// }
 
 // define routes, then need to create different elements for routes in routes directory
 root.render(
@@ -46,7 +35,6 @@ root.render(
       <Route path="auctions/:auctionId" element={<Auction />}></Route>
       <Route path="login" element={<Login />} />
       <Route path="register" element={<RegisterPage />} />
-      TODO: path="auctions/userId/newAuction"
       <Route path="newAuction" element={<NewAuction />} />
       <Route path="myAuctions" element={<MyAuctions />}></Route>
       <Route path="myAuctions/:auctionId/edit" element={<EditAuction />} />

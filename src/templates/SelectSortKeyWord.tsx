@@ -13,8 +13,6 @@ interface IStatusProps {
 }
 
 export default function SelectSortKeyWord(props: IStatusProps) {
-  // const [sortKeyWord, setSortKeyWord] = React.useState("");
-
   const handleChange = (event: SelectChangeEvent) => {
     props.setSortKeyWord(event.target.value);
   };

@@ -260,7 +260,6 @@ export default function AnAuction() {
           >
             {auction.title}
           </Typography>
-          {/*</Container>*/}
         </Grid>
 
         <Grid item xs={6}>

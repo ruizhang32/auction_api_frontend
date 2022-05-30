@@ -1,5 +1,4 @@
 import Avatar from "@mui/material/Avatar";
-import Grid from "@mui/material/Grid";
 import MenuItem from "@mui/material/MenuItem";
 import axios from "axios";
 import React from "react";
@@ -8,22 +7,22 @@ import { Link } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { IconButton, Menu, Tooltip } from "@mui/material";
+import { defaultImageUrl } from "../utility/util";
 
 export default function AppBar() {
   let [isLoggedIn, setIsLoggedIn] = React.useState(
     sessionStorage.getItem("token") !== null
   );
-  const [isNewAuction, setIsNewAuction] = React.useState(false);
-  const [userName, setUserName] = React.useState("");
-  const [errorFlag, setErrorFlag] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState("");
+  const [userName, setUserName] = React.useState<string>("");
+  const [errorFlag, setErrorFlag] = React.useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = React.useState<string>("");
   const userId = sessionStorage.getItem("userId");
+  const [imageURL, setImageURL] = React.useState<string>(defaultImageUrl);
 
   React.useEffect(() => {
     getUserId();
-    console.log(sessionStorage.getItem("token") === null);
-    console.log("isLoggedIn", isLoggedIn);
-  }, [isLoggedIn]);
+    isImageAvailable();
+  }, [isLoggedIn, imageURL]);
 
   const getUserId = () => {
     if (userId !== null) {
@@ -32,6 +31,24 @@ export default function AppBar() {
           setErrorFlag(false);
           setErrorMessage("");
           setUserName(response.data["firstName"]);
+        },
+        (error) => {
+          setErrorFlag(true);
+          setErrorMessage(error.response.statusText);
+        }
+      );
+    }
+  };
+
+  const isImageAvailable = () => {
+    if (userId !== null) {
+      axios.get("http://localhost:4941/api/v1/users/" + userId + "/image").then(
+        (response) => {
+          if (response.status !== 404) {
+            setImageURL(
+              "http://localhost:4941/api/v1/users/" + userId + "/image"
+            );
+          }
         },
         (error) => {
           setErrorFlag(true);
@@ -61,12 +78,7 @@ export default function AppBar() {
   };
 
   return (
-    <AppBarMui
-      position="static"
-      color="default"
-      elevation={0}
-      sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
-    >
+    <AppBarMui position="static" color="default" elevation={0}>
       <Toolbar sx={{ flexWrap: "wrap" }}>
         <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
           Auction App
@@ -123,11 +135,7 @@ export default function AppBar() {
               onClick={handleOpenUserMenu}
               sx={{ p: 0 }}
             >
-              <Avatar
-                hidden={!isLoggedIn}
-                alt={userName}
-                src={"http://localhost:4941/api/v1/users/" + userId + "/image"}
-              />
+              <Avatar hidden={!isLoggedIn} alt={userName} src={imageURL} />
             </IconButton>
           </Tooltip>
           <Menu
@@ -157,12 +165,7 @@ export default function AppBar() {
             <MenuItem key={"MyAuctions"} component={Link} to="/MyAuctions">
               My Auctions
             </MenuItem>
-            <MenuItem
-              key={"newAuction"}
-              component={Link}
-              to="/newAuction"
-              onClick={() => setIsNewAuction(true)}
-            >
+            <MenuItem key={"newAuction"} component={Link} to="/newAuction">
               New Auction
             </MenuItem>
           </Menu>

@@ -9,40 +9,37 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
-import MultipleSelectChip from "../templates/MultipleSelect";
-import equals, {
-  calcCategories,
-  calcCategory,
-  defaultImageUrl,
-  formatDate,
-  getCategoryIdsByNames,
-} from "../Utility/util";
+import equals, { defaultImageUrl, formatDate } from "../utility/util";
 import SelectCategory from "./SelectCategory";
 
 export default function AuctionForm() {
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
-  const [categoryNames, setCategoryNames] = React.useState<string[]>([]);
+
   const [auctionTitle, setAuctionTitle] = React.useState<string>("");
   const [description, setDescription] = React.useState<string>("");
   const [reservePrice, setReservePrice] = React.useState<string>("");
-  const [auctionCategory, setAuctionCategory] = React.useState<string>("");
+
   const [auctionImage, setAuctionImage] =
     React.useState<string>(defaultImageUrl);
-  const [categoryId, setCategoryId] = React.useState<string>();
+
   const [selectedCategoryId, setSelectedCategoryId] =
     React.useState<string>("");
   const [errorFlag, setErrorFlag] = React.useState(false);
+  const [imageErrorFlag, setImageErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
+  const [imageErrorMessage, setImageErrorMessage] = React.useState("");
   const [date, setDate] = React.useState<Date>(new Date());
-  const [isTitleValidate, setIsTitleValidate] = React.useState<boolean>(true);
-  const [isCategoryValidate, setIsCategoryValidate] =
-    React.useState<boolean>(true);
-  const [isReservePriceValidate, setIsReservePriceValidate] =
-    React.useState<boolean>(true);
-  const [isEndDateValidate, setIsEndDateValidate] =
-    React.useState<boolean>(true);
-  const [isDescriptionValidate, setIsDescriptionValidate] =
-    React.useState<boolean>(true);
+  const [fileContentType, setFileContentType] = React.useState<string>("");
+  // const [isTitleValidate, setIsTitleValidate] = React.useState<boolean>(true);
+  // const [isCategoryValidate, setIsCategoryValidate] =
+  //   React.useState<boolean>(true);
+  // const [isReservePriceValidate, setIsReservePriceValidate] =
+  //   React.useState<boolean>(true);
+  // const [isEndDateValidate, setIsEndDateValidate] =
+  //   React.useState<boolean>(true);
+  // const [isDescriptionValidate, setIsDescriptionValidate] =
+  //   React.useState<boolean>(true);
+  const [isImageValidate, setIsImageValidate] = React.useState<number>(0);
   const [auctionIsUpdated, setAuctionIsUpdated] =
     React.useState<boolean>(false);
   let imageIsUpdated = false;
@@ -83,23 +80,28 @@ export default function AuctionForm() {
       setMyAuction(auction);
       setImageIsUploaded(false);
     }
-  }, [auction]);
+  }, [auction, fileExt, isImageValidate]);
 
   function uploadImage(myAuctionId: number) {
     if (!imageIsUploaded) {
       return;
     }
     imageIsUpdated = false;
-    let fileContentType = "";
-    const lowerFileExt = fileExt.toLowerCase();
-    if (lowerFileExt === "png") {
-      fileContentType = "image/png";
-    } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
-      fileContentType = "image/jpeg";
-    } else if (lowerFileExt === "gif") {
-      fileContentType = "image/gif";
-    }
-    if (fileContentType !== "") {
+    // let fileContentType = "";
+    // const lowerFileExt = fileExt.toLowerCase();
+    // if (lowerFileExt === "png") {
+    //   fileContentType = "image/png";
+    //   setIsImageValidate(1);
+    // } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+    //   fileContentType = "image/jpeg";
+    //   setIsImageValidate(1);
+    // } else if (lowerFileExt === "gif") {
+    //   fileContentType = "image/gif";
+    //   setIsImageValidate(1);
+    // } else {
+    //   setIsImageValidate(2);
+    // }
+    if (fileContentType !== "" && isImageValidate === 1) {
       const addImageUrl = `http://localhost:4941/api/v1/auctions/${myAuctionId}/image`;
       const imageConfig = {
         headers: {
@@ -123,15 +125,15 @@ export default function AuctionForm() {
   }
 
   const postAnAuction = () => {
-    if(!imageIsUploaded){
+    if (!imageIsUploaded) {
       setErrorFlag(true);
       setErrorMessage("No image uploaded");
       return;
     }
     const dbFormatDate: string = formatDate(date);
 
-    let bodyParameters = {}
-    if(reservePrice !== ""){
+    let bodyParameters: {};
+    if (reservePrice !== "") {
       bodyParameters = {
         title: auctionTitle,
         categoryId: selectedCategoryId,
@@ -139,17 +141,16 @@ export default function AuctionForm() {
         endDate: dbFormatDate,
         description: description,
         sellerId: sellerId,
-      }
-    }else{
+      };
+    } else {
       bodyParameters = {
         title: auctionTitle,
         categoryId: selectedCategoryId,
         endDate: dbFormatDate,
         description: description,
         sellerId: sellerId,
-      }
+      };
     }
-
 
     console.log(bodyParameters);
 
@@ -173,8 +174,8 @@ export default function AuctionForm() {
   const putAnAuction = () => {
     const dbFormatDate: string = formatDate(date);
 
-    let bodyParameters = {}
-    if(reservePrice !== ""){
+    let bodyParameters: {};
+    if (reservePrice !== "") {
       bodyParameters = {
         title: auctionTitle,
         categoryId: selectedCategoryId,
@@ -182,15 +183,15 @@ export default function AuctionForm() {
         endDate: dbFormatDate,
         description: description,
         sellerId: sellerId,
-      }
-    }else{
+      };
+    } else {
       bodyParameters = {
         title: auctionTitle,
         categoryId: selectedCategoryId,
         endDate: dbFormatDate,
         description: description,
         sellerId: sellerId,
-      }
+      };
     }
 
     axios
@@ -216,7 +217,6 @@ export default function AuctionForm() {
         }
       );
   };
-  //  setImageIsUploaded(false);
 
   const getAnAuction = () => {
     axios.get("http://localhost:4941/api/v1/auctions/" + auctionId).then(
@@ -242,16 +242,16 @@ export default function AuctionForm() {
       })
       .then(
         (response) => {
-          setErrorFlag(false);
-          setErrorMessage("");
+          setImageErrorFlag(false);
+          setImageErrorMessage("");
           const photoUrl = URL.createObjectURL(response.data);
           if (!equals(photoUrl, auctionImage)) {
             setAuctionImage(photoUrl);
           }
         },
         (error) => {
-          setErrorFlag(true);
-          setErrorMessage(error.response.statusText);
+          setImageErrorFlag(true);
+          setImageErrorMessage(error.response.statusText);
         }
       );
   };
@@ -319,10 +319,30 @@ export default function AuctionForm() {
       setUploadFile(uploadFile);
       setImageIsUploaded(true);
       const fileSplits = uploadFile.name.split(".");
+      console.log("fileSplits: ", fileSplits);
       if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
+        console.log("uploadFileExt: ", uploadFileExt);
         if (uploadFileExt !== undefined) {
           setFileExt(uploadFileExt);
+
+          // check if uploaded image is a valid type, if not, set flag to 2
+          const lowerFileExt = uploadFileExt.toLowerCase();
+          console.log("lowerFileExt: ", lowerFileExt);
+          if (lowerFileExt === "png") {
+            setFileContentType("image/png");
+            setIsImageValidate(1);
+          } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+            setFileContentType("image/jpeg");
+            setIsImageValidate(1);
+          } else if (lowerFileExt === "gif") {
+            setFileContentType("image/gif");
+            setIsImageValidate(1);
+          } else {
+            console.log("hey");
+            setIsImageValidate(2);
+            console.log("IsImageValidate: ", isImageValidate);
+          }
         }
       }
     }
@@ -362,88 +382,36 @@ export default function AuctionForm() {
               value={auctionTitle}
               onChange={(e) => setAuctionTitle(e.target.value)}
             />
-            <div hidden={isTitleValidate}>
-              <Alert
-                variant="outlined"
-                severity="error"
-                sx={{ width: 200, m: 1 }}
-              >
-                Auction Title is required
-              </Alert>
-            </div>
+            {/*<div hidden={isTitleValidate}>*/}
+            {/*  <Alert*/}
+            {/*    variant="outlined"*/}
+            {/*    severity="error"*/}
+            {/*    sx={{ width: 200, m: 1 }}*/}
+            {/*  >*/}
+            {/*    Auction Title is required*/}
+            {/*  </Alert>*/}
+            {/*</div>*/}
           </div>
           <div>
             <Typography variant="h6" component="div" gutterBottom>
               Category
             </Typography>
             <Box sx={{ width: 500 }}>
-              {/*<MultipleSelectChip*/}
-              {/*  selectedCategoryIdList={selectedCategoryIdList}*/}
-              {/*  setSelectedCategoryIdList={setSelectedCategoryIdList}*/}
-              {/*></MultipleSelectChip>*/}
               <SelectCategory
                 selectedCategoryId={selectedCategoryId}
                 setSelectedCategoryId={setSelectedCategoryId}
               ></SelectCategory>
             </Box>
-            <div hidden={isCategoryValidate}>
-              <Alert
-                variant="outlined"
-                severity="error"
-                sx={{ width: 300, m: 1 }}
-              >
-                Please select a category for your auction
-              </Alert>
-            </div>
+            {/*<div hidden={isCategoryValidate}>*/}
+            {/*  <Alert*/}
+            {/*    variant="outlined"*/}
+            {/*    severity="error"*/}
+            {/*    sx={{ width: 300, m: 1 }}*/}
+            {/*  >*/}
+            {/*    Please select a category for your auction*/}
+            {/*  </Alert>*/}
+            {/*</div>*/}
           </div>
-          {/*<div>*/}
-          {/*  <Typography variant="h6" component="div" gutterBottom>*/}
-          {/*    Category*/}
-          {/*  </Typography>*/}
-          {/*  <FormControl sx={{ m: 1, width: 500 }}>*/}
-          {/*    <InputLabel id="demo-multiple-name-label">Required *</InputLabel>*/}
-
-          {/*    <Select*/}
-          {/*      labelId="demo-select-small"*/}
-          {/*      id="demo-select-small"*/}
-          {/*      value={auctionCategory}*/}
-          {/*      label="auctionCategory"*/}
-          {/*      onChange={handleCategoryChange}*/}
-          {/*    >*/}
-          {/*      {getCategoryNames().map((name, i) => (*/}
-          {/*        <MenuItem key={i} value={name}>*/}
-          {/*          {name}*/}
-          {/*        </MenuItem>*/}
-          {/*      ))}*/}
-          {/*    </Select>*/}
-          {/*    <Select*/}
-          {/*      labelId="demo-multiple-checkbox-label"*/}
-          {/*      id="demo-multiple-checkbox"*/}
-          {/*      multiple*/}
-          {/*      value={selected}*/}
-          {/*      onChange={handleCategoryChange}*/}
-          {/*      input={<OutlinedInput label="Tag" />}*/}
-          {/*      // renderValue={(selected) => selected.join(", ")}*/}
-          {/*    >*/}
-          {/*      {getCategoryNames().map((name, i) => (*/}
-          {/*        <MenuItem key={i} value={name}>*/}
-          {/*          /!*checked: If true, the component is checked.*!/*/}
-          {/*          <Checkbox checked={auctionCategory.indexOf(name) > -1} />*/}
-          {/*          <ListItemText primary={name} />*/}
-          {/*        </MenuItem>*/}
-          {/*      ))}*/}
-          {/*    </Select>*/}
-          {/*  </FormControl>*/}
-          {/*  <div hidden={isCategoryValidate}>*/}
-          {/*    <Alert*/}
-          {/*      variant="outlined"*/}
-          {/*      severity="error"*/}
-          {/*      sx={{ width: 300, m: 1 }}*/}
-          {/*    >*/}
-          {/*      Please select a category for your auction*/}
-          {/*    </Alert>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
           <div>
             <Typography variant="h6" component="div" gutterBottom>
               End Date
@@ -456,15 +424,15 @@ export default function AuctionForm() {
                 renderInput={(endDate) => <TextField {...endDate} />}
               />
             </LocalizationProvider>
-            <div hidden={isEndDateValidate}>
-              <Alert
-                variant="outlined"
-                severity="error"
-                sx={{ width: 250, m: 1 }}
-              >
-                End date must be in the future
-              </Alert>
-            </div>
+            {/*<div hidden={isEndDateValidate}>*/}
+            {/*  <Alert*/}
+            {/*    variant="outlined"*/}
+            {/*    severity="error"*/}
+            {/*    sx={{ width: 250, m: 1 }}*/}
+            {/*  >*/}
+            {/*    End date must be in the future*/}
+            {/*  </Alert>*/}
+            {/*</div>*/}
           </div>
           <div>
             <Typography variant="h6" component="div" gutterBottom>
@@ -505,6 +473,15 @@ export default function AuctionForm() {
                 <Button variant="outlined" component="span">
                   Upload
                 </Button>
+                <div hidden={isImageValidate !== 2}>
+                  <Alert
+                    variant="outlined"
+                    severity="error"
+                    sx={{ width: 200, m: 1 }}
+                  >
+                    Image must be image/jpeg, image/png, image/gif type
+                  </Alert>
+                </div>
               </label>
             </Box>
           </div>
@@ -527,15 +504,15 @@ export default function AuctionForm() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <div hidden={isDescriptionValidate}>
-              <Alert
-                variant="outlined"
-                severity="error"
-                sx={{ width: 200, m: 1 }}
-              >
-                Description is required
-              </Alert>
-            </div>
+            {/*<div hidden={isDescriptionValidate}>*/}
+            {/*  <Alert*/}
+            {/*    variant="outlined"*/}
+            {/*    severity="error"*/}
+            {/*    sx={{ width: 200, m: 1 }}*/}
+            {/*  >*/}
+            {/*    Description is required*/}
+            {/*  </Alert>*/}
+            {/*</div>*/}
           </div>
           <div>
             <Typography
@@ -555,15 +532,24 @@ export default function AuctionForm() {
               value={reservePrice}
               onChange={(e) => setReservePrice(e.target.value)}
             />
-            <div hidden={isReservePriceValidate}>
-              <Alert
-                variant="outlined"
-                severity="error"
-                sx={{ width: 300, m: 1 }}
-              >
-                Reserve price must be $1 or more
-              </Alert>
-            </div>
+            {/*<div hidden={isReservePriceValidate}>*/}
+            {/*  <Alert*/}
+            {/*    variant="outlined"*/}
+            {/*    severity="error"*/}
+            {/*    sx={{ width: 300, m: 1 }}*/}
+            {/*  >*/}
+            {/*    Reserve price must be $1 or more*/}
+            {/*  </Alert>*/}
+            {/*</div>*/}
+          </div>
+          <div hidden={errorFlag}>
+            <Alert
+              variant="outlined"
+              severity="error"
+              sx={{ width: 300, m: 1 }}
+            >
+              {errorMessage}
+            </Alert>
           </div>
         </Box>
         <Box sx={{ align: "right", mt: 4 }}>

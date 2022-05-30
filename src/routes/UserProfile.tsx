@@ -1,5 +1,4 @@
 import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
 import React from "react";
 import AppBar from "../templates/AppBar";
 import UserForm from "../templates/UserForm";
