@@ -15,6 +15,7 @@ import {
 import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Container from "@mui/material/Container";
+import { Link } from "react-router-dom";
 import Typography from "@mui/material/Typography";
 import React from "react";
 import axios from "axios";
@@ -295,6 +296,7 @@ const MyAuctions = () => {
                   <TableCell align="right">Seller</TableCell>
                   <TableCell align="right">Highest Bid</TableCell>
                   <TableCell align="right">Reserve</TableCell>
+                  <TableCell align="right">Auction Link</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -315,6 +317,9 @@ const MyAuctions = () => {
                     </TableCell>
                     <TableCell align="right">{bid.highestBid}</TableCell>
                     <TableCell align="right">{bid.reserve}</TableCell>
+                    <TableCell align="right">
+                      <Link to={"/auctions/" + bid.auctionId}>Link</Link>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
