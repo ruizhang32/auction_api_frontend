@@ -33,6 +33,9 @@ export default function UserForm() {
   const [uploadFile, setUploadFile] = React.useState<File>(newFile);
   const [fileExt, setFileExt] = React.useState<string>("");
   const [image, setImage] = React.useState<string>(defaultImageUrl);
+  const [isImageValidate, setIsImageValidate] = React.useState<number>(0);
+  const [imageIsUploaded, setImageIsUploaded] = React.useState<boolean>(false);
+  const [fileContentType, setFileContentType] = React.useState<string>("");
   const id = sessionStorage.getItem("userId");
   const token = sessionStorage.getItem("token");
   const config = { headers: { "X-Authorization": `${token}` } };
@@ -134,16 +137,16 @@ export default function UserForm() {
       );
   };
 
-  const putAuctionImage = (myFileExt: string, myUploadFile: File) => {
-    let fileContentType = "";
-    const lowerFileExt = myFileExt.toLowerCase();
-    if (lowerFileExt === "png") {
-      fileContentType = "image/png";
-    } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
-      fileContentType = "image/jpeg";
-    } else if (lowerFileExt === "gif") {
-      fileContentType = "image/gif";
-    }
+  const putUserImage = (myFileExt: string, myUploadFile: File) => {
+    // let fileContentType = "";
+    // const lowerFileExt = myFileExt.toLowerCase();
+    // if (lowerFileExt === "png") {
+    //   fileContentType = "image/png";
+    // } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+    //   fileContentType = "image/jpeg";
+    // } else if (lowerFileExt === "gif") {
+    //   fileContentType = "image/gif";
+    // }
     let addImageUrl = "";
     if (id !== null) {
       addImageUrl = `http://localhost:4941/api/v1/users/${id}/image`;
@@ -187,14 +190,42 @@ export default function UserForm() {
 
   const onImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files !== null) {
-      const myUploadFile = e.target.files[0];
-      setImage(URL.createObjectURL(myUploadFile));
-      const fileSplits = myUploadFile.name.split(".");
+      const uploadFile = e.target.files[0];
+      setImage(URL.createObjectURL(uploadFile));
+      setUploadFile(uploadFile);
+      const fileSplits = uploadFile.name.split(".");
+
       if (fileSplits !== undefined) {
         const uploadFileExt = fileSplits.pop();
         if (uploadFileExt !== undefined) {
-          putAuctionImage(uploadFileExt, myUploadFile);
+          setFileExt(uploadFileExt);
+          // check if uploaded image is a valid type, if not, set flag to 2
+          const lowerFileExt = uploadFileExt.toLowerCase();
+          if (lowerFileExt === "png") {
+            setFileContentType("image/png");
+            setIsImageValidate(1);
+            setImageIsUploaded(true);
+            putUserImage(uploadFileExt, uploadFile);
+          } else if (lowerFileExt === "jpeg" || lowerFileExt === "jpg") {
+            setFileContentType("image/jpeg");
+            setIsImageValidate(1);
+            setImageIsUploaded(true);
+            putUserImage(uploadFileExt, uploadFile);
+          } else if (lowerFileExt === "gif") {
+            setFileContentType("image/gif");
+            setIsImageValidate(1);
+            setImageIsUploaded(true);
+            putUserImage(uploadFileExt, uploadFile);
+          } else {
+            setIsImageValidate(2);
+            setImageIsUploaded(false);
+          }
+        } else {
+          setIsImageValidate(2);
+          setImageIsUploaded(false);
         }
+      } else {
+        setImageIsUploaded(false);
       }
     }
   };
@@ -255,6 +286,15 @@ export default function UserForm() {
                   <Button variant="outlined" component="span">
                     Upload Image
                   </Button>
+                  <div hidden={isImageValidate !== 2}>
+                    <Alert
+                      variant="outlined"
+                      severity="error"
+                      sx={{ width: 400, mt: 1, mb: 1 }}
+                    >
+                      Image must be image/jpeg, image/png, image/gif type
+                    </Alert>
+                  </div>
                 </label>
               </Grid>
               <Grid item xs={2}>
