@@ -221,11 +221,11 @@ const AllAuctions = (props: IAuctionsProps) => {
                   >
                     {(Date.parse(auction.endDate.toString().substring(0, 10)) -
                       Date.now()) /
-                      (60 * 1000 * 60 * 24) ===
+                      (60 * 1000 * 60 * 24) <
                     1
-                      ? "closes tmr"
-                      : "closes in " +
-                        Math.ceil(
+                      ? "Closed"
+                      : "Closes in " +
+                        Math.floor(
                           (Date.parse(
                             auction.endDate.toString().substring(0, 10)
                           ) -
