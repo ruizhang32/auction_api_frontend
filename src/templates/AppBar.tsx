@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { IconButton, Menu, Tooltip } from "@mui/material";
-import { defaultImageUrl } from "../utility/util";
+import { defaultUserImageUrl } from "../utility/util";
 
 export default function AppBar() {
   let [isLoggedIn, setIsLoggedIn] = React.useState(
@@ -17,7 +17,7 @@ export default function AppBar() {
   const [errorFlag, setErrorFlag] = React.useState<boolean>(false);
   const [errorMessage, setErrorMessage] = React.useState<string>("");
   const userId = sessionStorage.getItem("userId");
-  const [imageURL, setImageURL] = React.useState<string>(defaultImageUrl);
+  const [imageURL, setImageURL] = React.useState<string>(defaultUserImageUrl);
 
   React.useEffect(() => {
     getUserId();

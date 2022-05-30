@@ -477,7 +477,7 @@ export default function AuctionForm() {
                   <Alert
                     variant="outlined"
                     severity="error"
-                    sx={{ width: 200, m: 1 }}
+                    sx={{ width: 400, m: 1 }}
                   >
                     Image must be image/jpeg, image/png, image/gif type
                   </Alert>
