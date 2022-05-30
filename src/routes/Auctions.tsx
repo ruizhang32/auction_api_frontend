@@ -7,6 +7,7 @@ import HeroUnit from "../templates/HeroUnit";
 import PaginationRounded from "../templates/Pagination";
 import Grid from "@mui/material/Grid";
 import MultipleSelectChip from "../templates/MultipleSelect";
+import SelectCategory from "../templates/SelectCategory";
 import SelectStatus from "../templates/SelectStatus";
 import SelectSortKeyWord from "../templates/SelectSortKeyWord";
 
@@ -15,6 +16,8 @@ const Auctions = () => {
   const [selectedCategoryIdList, setSelectedCategoryIdList] = React.useState<
     Array<string>
   >([]);
+  const [selectedCategoryId, setSelectedCategoryId] =
+    React.useState<string>("");
   const [status, setStatus] = React.useState<string>("");
   const [sortKeyWord, setSortKeyWord] = React.useState<string>("");
   const [sortOrder, setSortOrder] = React.useState<string>("");

@@ -15,8 +15,9 @@ import equals, {
   calcCategory,
   defaultImageUrl,
   formatDate,
-  getCategoryIdsByNames
+  getCategoryIdsByNames,
 } from "../Utility/util";
+import SelectCategory from "./SelectCategory";
 
 export default function AuctionForm() {
   const [categoryList, setCategoryList] = React.useState<Array<Category>>([]);
@@ -28,9 +29,8 @@ export default function AuctionForm() {
   const [auctionImage, setAuctionImage] =
     React.useState<string>(defaultImageUrl);
   const [categoryId, setCategoryId] = React.useState<string>();
-  const [selectedCategoryIdList, setSelectedCategoryIdList] = React.useState<
-    Array<string>
-  >([]);
+  const [selectedCategoryId, setSelectedCategoryId] =
+    React.useState<string>("");
   const [errorFlag, setErrorFlag] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
   const [date, setDate] = React.useState<Date>(new Date());
@@ -85,8 +85,8 @@ export default function AuctionForm() {
     }
   }, [auction]);
 
-  function uploadImage(myAuctionId : number) {
-    if(!imageIsUploaded){
+  function uploadImage(myAuctionId: number) {
+    if (!imageIsUploaded) {
       return;
     }
     imageIsUpdated = false;
@@ -108,15 +108,15 @@ export default function AuctionForm() {
         },
       };
       axios.put(addImageUrl, uploadFile, imageConfig).then(
-          (response) => {
-            if (response.status === 201 || response.status === 200) {
-              // auctionIsUpdated === true if auction is created or updated
-              imageIsUpdated = true;
-            }
-          },
-          (error) => {
-            throw error;
+        (response) => {
+          if (response.status === 201 || response.status === 200) {
+            // auctionIsUpdated === true if auction is created or updated
+            imageIsUpdated = true;
           }
+        },
+        (error) => {
+          throw error;
+        }
       );
     }
     setImageIsUploaded(false);
@@ -127,7 +127,8 @@ export default function AuctionForm() {
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: calcCategory(selectedCategoryIdList),
+      // categoryId: calcCategory(selectedCategoryIdList),
+      categoryId: selectedCategoryId,
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
@@ -158,7 +159,8 @@ export default function AuctionForm() {
 
     let bodyParameters = {
       title: auctionTitle,
-      categoryId: calcCategory(selectedCategoryIdList),
+      // categoryId: calcCategory(selectedCategoryIdList),
+      categoryId: selectedCategoryId,
       reserve: reservePrice,
       endDate: dbFormatDate,
       description: description,
@@ -177,7 +179,7 @@ export default function AuctionForm() {
           if (response.status === 200) {
             // auctionIsUpdated === true if auction is created or updated
             setAuctionIsUpdated(true);
-            if(auctionId !== undefined){
+            if (auctionId !== undefined) {
               uploadImage(parseInt(auctionId));
             }
           }
@@ -234,9 +236,14 @@ export default function AuctionForm() {
     }
 
     console.log(auction.categoryId);
-    const myCategoryLists = calcCategories(auction.categoryId);
-    if (!equals(myCategoryLists, selectedCategoryIdList)) {
-      setSelectedCategoryIdList(myCategoryLists);
+    // const myCategoryLists = calcCategories(auction.categoryId);
+    // if (!equals(myCategoryLists, selectedCategoryIdList)) {
+    //   setSelectedCategoryIdList(myCategoryLists);
+    // }
+
+    const myCategory = auction.categoryId.toString();
+    if (!equals(myCategory, selectedCategoryId)) {
+      setSelectedCategoryId(myCategory);
     }
 
     if (!equals(new Date(auction.endDate), date)) {
@@ -344,10 +351,14 @@ export default function AuctionForm() {
               Category
             </Typography>
             <Box sx={{ width: 500 }}>
-              <MultipleSelectChip
-                selectedCategoryIdList={selectedCategoryIdList}
-                setSelectedCategoryIdList={setSelectedCategoryIdList}
-              ></MultipleSelectChip>
+              {/*<MultipleSelectChip*/}
+              {/*  selectedCategoryIdList={selectedCategoryIdList}*/}
+              {/*  setSelectedCategoryIdList={setSelectedCategoryIdList}*/}
+              {/*></MultipleSelectChip>*/}
+              <SelectCategory
+                selectedCategoryId={selectedCategoryId}
+                setSelectedCategoryId={setSelectedCategoryId}
+              ></SelectCategory>
             </Box>
             <div hidden={isCategoryValidate}>
               <Alert
