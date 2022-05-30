@@ -24,7 +24,7 @@ export default function SelectCategory(props: ICategoryProps) {
 
   React.useEffect(() => {
     getCategories();
-  }, [categoryName, props.selectedCategoryId]);
+  }, []);
 
   const getCategories = () => {
     axios.get("http://localhost:4941/api/v1/auctions/categories/").then(

@@ -123,17 +123,33 @@ export default function AuctionForm() {
   }
 
   const postAnAuction = () => {
+    if(!imageIsUploaded){
+      setErrorFlag(true);
+      setErrorMessage("No image uploaded");
+      return;
+    }
     const dbFormatDate: string = formatDate(date);
 
-    let bodyParameters = {
-      title: auctionTitle,
-      // categoryId: calcCategory(selectedCategoryIdList),
-      categoryId: selectedCategoryId,
-      reserve: reservePrice,
-      endDate: dbFormatDate,
-      description: description,
-      sellerId: sellerId,
-    };
+    let bodyParameters = {}
+    if(reservePrice !== ""){
+      bodyParameters = {
+        title: auctionTitle,
+        categoryId: selectedCategoryId,
+        reserve: reservePrice,
+        endDate: dbFormatDate,
+        description: description,
+        sellerId: sellerId,
+      }
+    }else{
+      bodyParameters = {
+        title: auctionTitle,
+        categoryId: selectedCategoryId,
+        endDate: dbFormatDate,
+        description: description,
+        sellerId: sellerId,
+      }
+    }
+
 
     console.log(bodyParameters);
 
@@ -157,15 +173,25 @@ export default function AuctionForm() {
   const putAnAuction = () => {
     const dbFormatDate: string = formatDate(date);
 
-    let bodyParameters = {
-      title: auctionTitle,
-      // categoryId: calcCategory(selectedCategoryIdList),
-      categoryId: selectedCategoryId,
-      reserve: reservePrice,
-      endDate: dbFormatDate,
-      description: description,
-      sellerId: sellerId,
-    };
+    let bodyParameters = {}
+    if(reservePrice !== ""){
+      bodyParameters = {
+        title: auctionTitle,
+        categoryId: selectedCategoryId,
+        reserve: reservePrice,
+        endDate: dbFormatDate,
+        description: description,
+        sellerId: sellerId,
+      }
+    }else{
+      bodyParameters = {
+        title: auctionTitle,
+        categoryId: selectedCategoryId,
+        endDate: dbFormatDate,
+        description: description,
+        sellerId: sellerId,
+      }
+    }
 
     axios
       .patch(
